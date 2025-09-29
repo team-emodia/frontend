@@ -1,10 +1,9 @@
-import React from "react";
-import { MainPage } from "./MainPage";
+import { MainPageHome } from "./MainPage";
 
 function App() {
   return (
     <div className="App">
-      <MainPage />
+      <MainPageHome />  {/* ✅ export된 이름과 동일하게 */}
     </div>
   );
 }
