@@ -1,76 +1,75 @@
 import React from "react";
 import actions from "./assets/actions.svg";
 import image2 from "./assets/image-2.png";
-import image from "./assets/image.svg";
+
 import subtract from "./assets/subtract.svg";
-import vector from "./assets/vector.svg";
+
+
+import vector2 from "./assets/vector2.svg";
+
 
 export const MainPageHome = () => {
   return (
-    <div className="flex flex-col h-[900px] items-start gap-2.5 relative overflow-hidden bg-[linear-gradient(0deg,rgba(255,255,255,1)_0%,rgba(255,255,255,1)_100%)]">
+    <div className="relative flex flex-col items-center justify-center w-full min-h-screen overflow-hidden bg-white">
+      {/* Background Image */}
       <img
-        className="relative w-[1540px] h-[1007px] mr-[-100.00px] aspect-[1.53]"
-        alt="Image"
+        className="absolute inset-0 object-cover w-full h-full"
+        alt="Background"
         src={image2}
       />
 
-      <img
-        className="absolute w-full h-[8.00%] top-0 left-0"
-        alt="Vector"
-        src={vector}
-      />
+      {/* Header */}
+      <header className="absolute top-0 left-0 flex items-center justify-between w-full h-20 px-6 sm:px-10 lg:px-12">
+        <div className="flex items-center gap-2">
+          <img
+            className="w-8 h-8 sm:w-10 sm:h-10"
+            alt="Logo"
+            src={vector2}
+          />
+          <div className="font-bold italic text-gray-900 text-xl sm:text-2xl [font-family:'Inter-BoldItalic',Helvetica]">
+            Emodia
+          </div>
+        </div>
+        <div>
+          <img
+            className="w-auto h-8 mr-14 sm:h-10"
+            alt="Actions"
+            src={actions}
+            style={{ position: 'relative', right: '10px' }}
+          />
+        </div>
+      </header>
 
-      <div className="absolute w-[24.65%] h-[18.00%] top-[36.33%] left-[38.75%]">
-        <div className="absolute w-[98.87%] h-full top-0 left-0 [font-family:'Inter-BoldItalic',Helvetica] font-bold italic text-[#f4effef5] text-8xl tracking-[0] leading-[normal]">
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center flex-grow text-center">
+        {/* Emodia Title */}
+        <div className="font-bold italic text-[#f4effef5] text-6xl sm:text-7xl md:text-8xl [font-family:'Inter-BoldItalic',Helvetica]">
           Emodia
         </div>
 
-        <div className="absolute w-[98.87%] h-full top-0 left-0 [font-family:'Inter-BoldItalic',Helvetica] font-bold italic text-[#f4effef5] text-8xl tracking-[0] leading-[normal]">
-          Emodia
-        </div>
+        {/* Navigation Links */}
+        <nav className="flex items-center justify-center gap-8 mt-8 sm:gap-12 md:gap-16">
+          <a href="#" className="font-extrabold text-white text-sm sm:text-base [font-family:'DM_Sans-ExtraBold',Helvetica] whitespace-nowrap">
+            About
+          </a>
+          <a href="#" className="font-extrabold text-white text-sm sm:text-base [font-family:'DM_Sans-ExtraBold',Helvetica] whitespace-nowrap">
+            Calendar
+          </a>
+          <div className="relative">
+            <img
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              alt="Subtract"
+              src={subtract}
+            />
+          </div>
+          <a href="#" className="font-extrabold text-white text-sm sm:text-base [font-family:'DM_Sans-ExtraBold',Helvetica] whitespace-nowrap">
+            Workout
+          </a>
+          <a href="#" className="font-extrabold text-white text-sm sm:text-base [font-family:'DM_Sans-ExtraBold',Helvetica] whitespace-nowrap">
+            Stats
+          </a>
+        </nav>
       </div>
-
-      <div className="absolute top-[489px] left-[291px] w-[893px] h-[25px]">
-        <div className="absolute top-[3px] left-[845px] [font-family:'DM_Sans-ExtraBold',Helvetica] font-extrabold text-white text-base text-center tracking-[-0.40px] leading-[22.4px] whitespace-nowrap">
-          Stats
-        </div>
-
-        <div className="absolute top-px left-[643px] [font-family:'DM_Sans-ExtraBold',Helvetica] font-extrabold text-white text-base text-center tracking-[-0.40px] leading-[22.4px] whitespace-nowrap">
-          Workout
-        </div>
-
-        <div className="absolute top-px left-[197px] [font-family:'DM_Sans-ExtraBold',Helvetica] font-extrabold text-white text-base text-center tracking-[-0.40px] leading-[22.4px] whitespace-nowrap">
-          Calendar
-        </div>
-
-        <div className="absolute top-[3px] left-0 w-[70px] [font-family:'DM_Sans-ExtraBold',Helvetica] font-extrabold text-white text-base text-center tracking-[-0.40px] leading-[22.4px] whitespace-nowrap">
-          About
-        </div>
-
-        <img
-          className="absolute w-[3.25%] h-[92.00%] top-0 left-[48.15%]"
-          alt="Subtract"
-          src={subtract}
-        />
-      </div>
-
-      <div className="absolute w-[89.31%] h-[4.00%] top-[2.11%] left-[8.89%]">
-        <div className="absolute w-[6.84%] h-[80.56%] top-[5.56%] left-0 [font-family:'Inter-BoldItalic',Helvetica] font-bold italic text-gray-900 text-2xl tracking-[0] leading-[normal]">
-          Emodia
-        </div>
-
-        <img
-          className="absolute w-[15.55%] h-full top-0 left-[84.29%]"
-          alt="Actions"
-          src={actions}
-        />
-      </div>
-
-      <img
-        className="absolute w-[2.22%] h-[3.56%] top-[2.33%] left-[5.35%]"
-        alt="Vector"
-        src={image}
-      />
     </div>
   );
 };
