@@ -3,7 +3,7 @@ import leftPanel from "../assets/signup/left-panel.png";
 
 export const SignUpRestricted = () => {
   return (
-    <div className="bg-[url(/bg-full.svg)] w-full min-w-[1440px] h-[900px] relative">
+    <div className="bg-signup w-full min-w-[1440px] h-[900px] relative">
       {/* 왼쪽 패널 */}
       <img
         className="absolute w-[44%] h-[68%] top-[15%] left-[8%]"

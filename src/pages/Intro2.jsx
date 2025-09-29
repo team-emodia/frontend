@@ -1,6 +1,6 @@
 import React from "react";
-import imgStretch from "../assets/intro/8cacce6e-f0c1-4ce5-9c28-e3e1f6fb14a1-1.png";
-import imgMemo from "../assets/intro/55cf3b3c-bc3d-4b2b-acd8-d7203fc4ba46-1.png";
+import imgStretch from "../assets/intro/8cacce6e-f0c1-4ce5-9c28-e3e1f6fb14a1 1.png";
+import imgMemo from "../assets/intro/55cf3b3c-bc3d-4b2b-acd8-d7203fc4ba46 1.png";
 import image2 from "../assets/intro/image-2.png";
 import image from "../assets/intro/image.svg";
 import vector2 from "../assets/intro/vector-2.svg";
@@ -19,7 +19,7 @@ import vector14 from "../assets/intro/vector-14.svg";
 
 export const Intro2 = () => {
   return (
-    <div className="bg-[url('../assets/intro/vector.svg')] bg-[100%_100%] w-full min-w-[1440px] h-[900px] relative">
+    <div className="bg-intro w-full min-w-[1440px] h-[900px] relative">
       {/* 인트로 2 페이지 내용 */}
       <img src={imgStretch} alt="스트레칭 일러스트" />
       <img src={imgMemo} alt="메모 일러스트" />
