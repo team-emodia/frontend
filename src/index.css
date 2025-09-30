@@ -2,23 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Intro 배경 */
-.bg-intro {
-  background-image: url("./assets/intro/vector.svg");
-  background-size: 100% 100%;
+/* Intro 페이지 배경 */
+.intro-bg {
+  background-image: url("./assets/bg/vector-intro.svg");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Login 배경 */
-.bg-login {
-  background-image: url("./assets/login/bg-full.svg");
-  background-size: 100% 100%;
+/* Login 페이지 배경 */
+.login-bg {
+  background-image: url("./assets/bg/bg-login.svg");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
-/* SignUp 배경 */
-.bg-signup {
-  background-image: url("./assets/signup/bg-full.svg");
-  background-size: 100% 100%;
+/* Signup 페이지 배경 */
+.signup-bg {
+  background-image: url("./assets/bg/bg-signup.svg");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }
