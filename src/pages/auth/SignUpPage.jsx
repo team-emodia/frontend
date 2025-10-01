@@ -28,6 +28,12 @@ const SignUpPage = () => {
     navigate("/intro");
   };
 
+  // 이메일 중복확인 버튼 클릭
+  const handleCheckEmail = () => {
+    console.log("중복확인 요청:", email);
+    // 🔗 여기서 실제 API 요청을 연결하면 됨 (예: fetch("/api/check-email"))
+  };
+
   return (
     <div className="w-full h-screen flex flex-col bg-white">
       {/* ===== 상단 로고 + 네비게이션 ===== */}
@@ -78,6 +84,7 @@ const SignUpPage = () => {
           </h2>
 
           <form onSubmit={handleSignUp} className="space-y-5">
+            {/* User Name */}
             <input
               type="text"
               placeholder="User Name"
@@ -86,14 +93,27 @@ const SignUpPage = () => {
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
               required
             />
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
-              required
-            />
+
+            {/* Email + Check 버튼 */}
+            <div className="relative">
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 pr-20 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={handleCheckEmail}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300"
+              >
+                Check
+              </button>
+            </div>
+
+            {/* Password */}
             <input
               type="password"
               placeholder="Password"
