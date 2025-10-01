@@ -1,5 +1,4 @@
-// src/pages/main/MainPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // 이미지
@@ -9,15 +8,27 @@ import logoEmodia from "../../assets/logo/logo-emodia.svg";
 const MainPage = () => {
   const navigate = useNavigate();
 
-  // 로그인 여부 체크 (임시: localStorage 사용)
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  // 로그인 여부 (임시로 useState 사용 — 나중에 실제 인증 로직으로 교체 가능)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Get started 버튼 핸들러
+  // 로그인/로그아웃 토글 핸들러
+  const handleLoginLogout = () => {
+    if (isLoggedIn) {
+      // 로그아웃
+      setIsLoggedIn(false);
+      navigate("/");
+    } else {
+      // 로그인 페이지로 이동
+      navigate("/login");
+    }
+  };
+
+  // Get Started 버튼 동작
   const handleGetStarted = () => {
     if (isLoggedIn) {
-      navigate("/calendar"); // 로그인 되어 있으면 캘린더로
+      navigate("/calendar"); // 로그인 시 캘린더로 이동
     } else {
-      navigate("/signup/restricted"); // 아니면 제한된 회원가입 페이지로
+      navigate("/signup/restricted"); // 비로그인 시 제한 회원가입 페이지로 이동
     }
   };
 
@@ -30,7 +41,7 @@ const MainPage = () => {
         backgroundPosition: "center",
       }}
     >
-      {/* ===== 상단 헤더 ===== */}
+      {/* 상단 네비게이션 */}
       <header className="w-full flex justify-between items-center px-12 py-6 bg-white/30 backdrop-blur-md shadow-sm">
         {/* 로고 */}
         <div className="flex items-center space-x-3">
@@ -38,32 +49,31 @@ const MainPage = () => {
           <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
         </div>
 
-        {/* 로그인 / 시작 버튼 */}
+        {/* 로그인/시작 버튼 */}
         <div className="flex space-x-4">
           <button
-            onClick={() => navigate("/login")}
+            onClick={handleLoginLogout}
             className="px-5 py-2 rounded-full border border-gray-400 text-sm text-gray-800 hover:bg-gray-100"
           >
-            Log in
+            {isLoggedIn ? "Logout" : "Login"}
           </button>
           <button
             onClick={handleGetStarted}
             className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm hover:bg-gray-700"
           >
-            Get started
+            Get Started
           </button>
         </div>
       </header>
 
-      {/* ===== 메인 컨텐츠 ===== */}
+      {/* 메인 타이틀 */}
       <main className="flex-grow flex flex-col items-center justify-center text-center">
-        {/* 중앙 타이틀 */}
         <h1 className="text-7xl font-semibold italic text-white drop-shadow-lg">
           Emodia
         </h1>
 
-        {/* 중앙 네비게이션 */}
-        <nav className="mt-20 flex space-x-16">
+        {/* 중앙 메뉴 */}
+        <div className="mt-20 flex space-x-16">
           <button
             className="text-lg font-medium text-white hover:text-purple-200"
             onClick={() => navigate("/about")}
@@ -88,7 +98,7 @@ const MainPage = () => {
           >
             Stats
           </button>
-        </nav>
+        </div>
       </main>
     </div>
   );

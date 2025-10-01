@@ -16,12 +16,20 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 
 // Main
 import MainPage from "./pages/main/MainPage";
-import AboutPage from "./pages/main/AboutPage";
+import About1 from "./pages/main/About1";
+import About2 from "./pages/main/About2";
 import CalendarPage from "./pages/main/CalendarPage";
 import CalendarDayDetail from "./pages/main/CalendarDayDetail";
 import CalendarNewRecord from "./pages/main/CalendarNewRecord";
-import WorkoutPage from "./pages/main/WorkoutPage";
+import { Workout } from "./pages/main/WorkoutPage";
 import StatsPage from "./pages/main/StatsPage";
+import Start6 from "./pages/main/Start6";
+import Start3 from "./pages/main/Start3";
+import { Start4 } from "./pages/main/Start4";
+import { Start5 } from "./pages/main/Start5";
+import Start2 from "./pages/main/Start2";
+import Start1 from "./pages/main/Start1";
+
 
 function App() {
   return (
@@ -42,14 +50,25 @@ function App() {
 
       {/* Main */}
       <Route path="/main" element={<MainPage />} />
-      <Route path="/about" element={<AboutPage />} />
+      <Route path="/about" element={<About1 />} />
+      <Route path="/about2" element={<About2 />} />
+
+      {/* Calendar */}
       <Route path="/calendar" element={<CalendarPage />} />
-      <Route path="/calendar/day" element={<CalendarDayDetail />} />
-      <Route path="/calendar/new" element={<CalendarNewRecord />} />
-      <Route path="/workout" element={<WorkoutPage />} />
+      <Route path="/calendar/:day" element={<CalendarDayDetail />} />
+      <Route path="/calendar/:day/new" element={<CalendarNewRecord />} />
+
+      {/* Workout & Stats */}
+      <Route path="/workout" element={<Workout />} />
       <Route path="/stats" element={<StatsPage />} />
+      <Route path="/start6" element={<Start6 />} />
+      <Route path="/start3" element={<Start3 />} />
+      <Route path="/start4" element={<Start4 />} />
+      <Route path="/start5" element={<Start5 />} />
+      <Route path="/start2" element={<Start2 />} />
+      <Route path="/start1" element={<Start1 />} />
     </Routes>
-  );
+  );  
 }
 
 export default App;
