@@ -1,3 +1,4 @@
+// src/pages/auth/SignUpPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -23,8 +24,8 @@ const SignUpPage = () => {
     e.preventDefault();
     console.log("회원가입 시도:", { username, email, password });
 
-    // 회원가입 성공 시 → Intro1으로 이동
-    navigate("/intro1");
+    // ✅ 회원가입 성공 시 → IntroPage(통합 페이지)로 이동
+    navigate("/intro");
   };
 
   return (

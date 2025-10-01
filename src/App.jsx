@@ -1,12 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// Intro
-import Intro1 from "./pages/intro/Intro1";
-import Intro2 from "./pages/intro/Intro2";
-import Intro3 from "./pages/intro/Intro3";
-import Intro4 from "./pages/intro/Intro4";
-import Intro5 from "./pages/intro/Intro5";
+// Intro (단일 페이지로 통합)
+import IntroPage from "./pages/main/IntroPage";
 
 // Auth
 import LoginPage from "./pages/auth/LoginPage";
@@ -16,31 +12,19 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 
 // Main
 import MainPage from "./pages/main/MainPage";
-import About1 from "./pages/main/About1";
-import About2 from "./pages/main/About2";
+import AboutPage from "./pages/main/AboutPage";   // ✅ 새로 합친 AboutPage.jsx
 import CalendarPage from "./pages/main/CalendarPage";
-import CalendarDayDetail from "./pages/main/CalendarDayDetail";
-import CalendarNewRecord from "./pages/main/CalendarNewRecord";
 import { Workout } from "./pages/main/WorkoutPage";
 import StatsPage from "./pages/main/StatsPage";
-import Start6 from "./pages/main/Start6";
-import Start3 from "./pages/main/Start3";
-import { Start4 } from "./pages/main/Start4";
-import { Start5 } from "./pages/main/Start5";
-import Start2 from "./pages/main/Start2";
-import Start1 from "./pages/main/Start1";
 
+// ✅ 새로 합친 StartPage.jsx
+import StartPage from "./pages/main/StartPage";
 
 function App() {
   return (
     <Routes>
       {/* Intro */}
-      <Route path="/" element={<MainPage />} />
-      <Route path="/intro1" element={<Intro1 />} />
-      <Route path="/intro2" element={<Intro2 />} />
-      <Route path="/intro3" element={<Intro3 />} />
-      <Route path="/intro4" element={<Intro4 />} />
-      <Route path="/intro5" element={<Intro5 />} />
+      <Route path="/intro" element={<IntroPage />} />
 
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
@@ -49,26 +33,22 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Main */}
+      <Route path="/" element={<MainPage />} />
       <Route path="/main" element={<MainPage />} />
-      <Route path="/about" element={<About1 />} />
-      <Route path="/about2" element={<About2 />} />
+      <Route path="/about" element={<AboutPage />} />   {/* ✅ 통합 페이지 */}
 
       {/* Calendar */}
-      <Route path="/calendar" element={<CalendarPage />} />
-      <Route path="/calendar/:day" element={<CalendarDayDetail />} />
-      <Route path="/calendar/:day/new" element={<CalendarNewRecord />} />
+      <Route path="/calendar" element={<CalendarPage />} /> 
+      {/* CalendarDayDetail, CalendarNewRecord는 이제 모달 팝업에서 처리 → 제거 */}
 
       {/* Workout & Stats */}
       <Route path="/workout" element={<Workout />} />
       <Route path="/stats" element={<StatsPage />} />
-      <Route path="/start6" element={<Start6 />} />
-      <Route path="/start3" element={<Start3 />} />
-      <Route path="/start4" element={<Start4 />} />
-      <Route path="/start5" element={<Start5 />} />
-      <Route path="/start2" element={<Start2 />} />
-      <Route path="/start1" element={<Start1 />} />
+
+      {/* StartPage */}
+      <Route path="/start" element={<StartPage />} />
     </Routes>
-  );  
+  );
 }
 
 export default App;
