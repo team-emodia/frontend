@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// API
+import * as AuthAPI from "../../api/AuthAPI";
+
 // 로고 & 아이콘 & 배경
 import logoEmodia from "../../assets/logo/logo-emodia.svg";
 import homeIcon from "../../assets/illustrations/icon-home.svg";
@@ -10,23 +13,61 @@ import bgMain from "../../assets/bg/bg-gradient-1.png";
 const MainPage = () => {
   const navigate = useNavigate();
 
-  // 로그인 상태 관리 (authToken으로 통일)
+  // 로그인 상태 및 사용자 정보
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const [user, setUser] = useState(null);
 
-  // 토큰 상태 감시
+  // 페이지 진입 시 사용자 정보 확인
   useEffect(() => {
-    const checkToken = () => {
-      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    const checkUser = async () => {
+      // 1) 백엔드 준비 후: AuthAPI.getProfile() 사용
+      if (typeof AuthAPI.getProfile === "function") {
+        try {
+          const data = await AuthAPI.getProfile();
+          if (data) {
+            setIsLoggedIn(true);
+            setUser(data);
+            return;
+          }
+        } catch (err) {
+          console.warn("getProfile 호출 실패, localStorage fallback 사용:", err);
+        }
+      }
+
+      // 2) fallback: localStorage 확인
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        setIsLoggedIn(true);
+        setUser({ username: "Guest" }); // ✅ 임시 사용자명
+      } else {
+        setIsLoggedIn(false);
+        setUser(null);
+      }
     };
-    window.addEventListener("storage", checkToken);
-    return () => window.removeEventListener("storage", checkToken);
+
+    checkUser();
+
+    // storage 이벤트 감시 (다른 탭에서 토큰 변경 시 반영)
+    const handleStorageChange = () => {
+      checkUser();
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   // 로그아웃
-  const handleLogout = () => {
-    localStorage.removeItem("authToken"); // ✅ 통일
+  const handleLogout = async () => {
+    try {
+      if (typeof AuthAPI.logout === "function") {
+        await AuthAPI.logout(); // 서버 로그아웃 (백엔드 준비 후 동작)
+      }
+    } catch (error) {
+      console.warn("서버 로그아웃 실패:", error);
+    }
+    localStorage.removeItem("authToken");
     setIsLoggedIn(false);
-    navigate("/main"); // 로그아웃 시 메인 페이지로 이동
+    setUser(null);
+    navigate("/main");
   };
 
   // Get Started 버튼
@@ -34,7 +75,7 @@ const MainPage = () => {
     if (isLoggedIn) {
       navigate("/start");
     } else {
-      navigate("/signup/restricted");
+      navigate("/signup-restricted");
     }
   };
 
@@ -43,7 +84,7 @@ const MainPage = () => {
     if (isLoggedIn) {
       navigate(path);
     } else {
-      navigate("/signup/restricted"); // 로그인 안 돼 있으면 제한 페이지로 이동
+      navigate("/signup-restricted");
     }
   };
 
@@ -71,6 +112,9 @@ const MainPage = () => {
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <>
+              <span className="text-white text-sm mr-2">
+                {user?.username || "User"}
+              </span>
               <button
                 onClick={handleLogout}
                 className="px-5 py-2 rounded-full border border-white text-white text-sm font-medium hover:bg-white/20 transition"
@@ -118,7 +162,7 @@ const MainPage = () => {
 
         {/* 하단 네비 메뉴 */}
         <div className="flex space-x-12 text-white font-medium text-lg">
-          {/* About: 항상 활성화 */}
+          {/* About */}
           <button
             onClick={() => navigate("/about")}
             className="hover:text-purple-200"

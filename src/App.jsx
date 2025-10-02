@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -13,9 +12,9 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 
 // Main
 import MainPage from "./pages/main/MainPage";
-import AboutPage from "./pages/main/AboutPage";   // ✅ 새로 합친 AboutPage.jsx
+import AboutPage from "./pages/main/AboutPage";
 import CalendarPage from "./pages/main/CalendarPage";
-import { Workout } from "./pages/main/WorkoutPage";
+import WorkoutPage from "./pages/main/WorkoutPage"; // ✅ default export
 import StatsPage from "./pages/main/StatsPage";
 
 // ✅ 새로 합친 StartPage.jsx
@@ -24,29 +23,25 @@ import StartPage from "./pages/main/StartPage";
 function App() {
   return (
     <Routes>
-      {/* Intro */}
+      {/* Main → 기본 경로 */}
+      <Route path="/" element={<MainPage />} />
+
+      {/* Intro → 별도 경로 */}
       <Route path="/intro" element={<IntroPage />} />
 
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
-      <Route path="/signup/restricted" element={<SignUpRestricted />} /> {/* ✅ 경로 통일 */}
+      <Route path="/signup-restricted" element={<SignUpRestricted />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Main */}
-      <Route path="/" element={<MainPage />} />
-      <Route path="/main" element={<MainPage />} />
-      <Route path="/about" element={<AboutPage />} />   {/* ✅ 통합 페이지 */}
-
-      {/* Calendar */}
-      <Route path="/calendar" element={<CalendarPage />} /> 
-      {/* CalendarDayDetail, CalendarNewRecord는 모달 팝업에서 처리 → 제거 */}
-
-      {/* Workout & Stats */}
-      <Route path="/workout" element={<Workout />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/calendar" element={<CalendarPage />} />
+      <Route path="/workout" element={<WorkoutPage />} />
       <Route path="/stats" element={<StatsPage />} />
 
-      {/* StartPage */}
+      {/* Start */}
       <Route path="/start" element={<StartPage />} />
     </Routes>
   );
