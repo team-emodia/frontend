@@ -1,3 +1,4 @@
+// src/pages/auth/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,27 +12,74 @@ import logoGoogle from "../../assets/logo/logo-google.svg";
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  // 상태 관리
+  // 상태
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // 로그인 버튼 클릭
-  const handleLogin = (e) => {
+  // 로그인 처리
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("로그인 시도:", { email, password });
-    // 임시 로그인 성공 후 메인 페이지 이동
-    navigate("/main");
+    try {
+      // TODO: 백엔드 연동 자리
+      // const response = await axios.post("/api/login", { email, password });
+      // const token = response.data.token;
+
+      // 지금은 임시 토큰
+      localStorage.setItem("token", "dummy-token");
+
+      navigate("/main"); // 로그인 성공 → 메인
+    } catch (error) {
+      alert("로그인 실패");
+    }
   };
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      {/* 상단 로고 */}
-      <header className="flex items-center px-10 py-6">
-        <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
-        <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
+      {/* ================= 상단바 ================= */}
+      <header className="w-full flex justify-between items-center px-12 py-6 bg-white shadow-sm">
+        {/* 좌측 로고 */}
+        <div
+          className="flex items-center space-x-3 cursor-pointer"
+          onClick={() => navigate("/main")}
+        >
+          <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
+          <h1 className="text-lg italic font-semibold text-gray-800">Emodia</h1>
+        </div>
+
+        {/* 중앙 메뉴 */}
+        <nav className="flex space-x-8 text-gray-700 font-medium">
+          <button onClick={() => navigate("/about")} className="hover:text-purple-600">
+            About
+          </button>
+          <button onClick={() => navigate("/calendar")} className="hover:text-purple-600">
+            Calendar
+          </button>
+          <button onClick={() => navigate("/workout")} className="hover:text-purple-600">
+            Workout
+          </button>
+          <button onClick={() => navigate("/stats")} className="hover:text-purple-600">
+            Stats
+          </button>
+        </nav>
+
+        {/* 우측 버튼 */}
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => navigate("/signup")}
+            className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
+          >
+            Sign up
+          </button>
+          <button
+            onClick={() => navigate("/start")}
+            className="px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900 transition"
+          >
+            Get Started
+          </button>
+        </div>
       </header>
 
-      {/* 메인 컨텐츠 */}
+      {/* ================= 메인 컨텐츠 ================= */}
       <main className="flex flex-1 items-center justify-center px-8">
         {/* 왼쪽 이미지 */}
         <div className="flex-1 flex justify-center items-center">
@@ -44,6 +92,7 @@ const LoginPage = () => {
 
         {/* 오른쪽 로그인 박스 */}
         <div className="flex-1 max-w-md">
+          {/* 타이틀 */}
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Nice to meet you
           </h2>
@@ -67,21 +116,14 @@ const LoginPage = () => {
               required
             />
 
-            {/* 비밀번호 찾기 & 계정 생성 */}
-            <div className="flex justify-between text-sm text-gray-600">
+            {/* 비밀번호 찾기 */}
+            <div className="flex justify-end text-sm text-gray-600">
               <button
                 type="button"
                 onClick={() => navigate("/forgot-password")}
                 className="hover:underline"
               >
                 Forgot password?
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/signup")}
-                className="text-purple-600 font-medium hover:underline"
-              >
-                Create Account
               </button>
             </div>
 
@@ -94,17 +136,17 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* 소셜 로그인 */}
+          {/* 소셜 로그인 버튼 */}
           <div className="space-y-3 mt-6">
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50">
+            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
               <img src={logoKakao} alt="Kakao" className="w-6 h-6" />
               Login with Kakao
             </button>
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50">
+            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
               <img src={logoApple} alt="Apple" className="w-6 h-6" />
               Login with Apple
             </button>
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50">
+            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
               <img src={logoGoogle} alt="Google" className="w-6 h-6" />
               Login with Google
             </button>

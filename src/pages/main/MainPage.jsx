@@ -1,101 +1,150 @@
-import React, { useState } from "react";
+// src/pages/main/MainPage.jsx
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// 이미지
-import bgGradient from "../../assets/bg/bg-gradient-1.png";
+// 로고 & 아이콘 & 배경
 import logoEmodia from "../../assets/logo/logo-emodia.svg";
+import homeIcon from "../../assets/illustrations/icon-home.svg";
+import bgMain from "../../assets/bg/bg-gradient-1.png";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
-  // 로그인 여부 (임시로 useState 사용 — 나중에 실제 인증 로직으로 교체 가능)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 로그인 상태를 state로 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  // 로그인/로그아웃 토글 핸들러
-  const handleLoginLogout = () => {
-    if (isLoggedIn) {
-      // 로그아웃
-      setIsLoggedIn(false);
-      navigate("/");
-    } else {
-      // 로그인 페이지로 이동
-      navigate("/login");
-    }
+  // localStorage 토큰 상태 감시 (토큰이 바뀌면 UI 업데이트)
+  useEffect(() => {
+    const checkToken = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
+
+    // storage 이벤트 리스너 (다른 탭에서도 동기화 가능)
+    window.addEventListener("storage", checkToken);
+
+    return () => {
+      window.removeEventListener("storage", checkToken);
+    };
+  }, []);
+
+  // 로그아웃
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false); // 즉시 UI 반영
+    navigate("/login");
   };
 
   // Get Started 버튼 동작
   const handleGetStarted = () => {
     if (isLoggedIn) {
-      navigate("/calendar"); // 로그인 시 캘린더로 이동
+      navigate("/start"); // 로그인 상태면 StartPage
     } else {
-      navigate("/signup/restricted"); // 비로그인 시 제한 회원가입 페이지로 이동
+      navigate("/signup/restricted"); // 비로그인 → Restricted SignUp
     }
   };
 
   return (
     <div
-      className="relative w-full h-screen flex flex-col"
+      className="w-full min-h-screen flex flex-col"
       style={{
-        backgroundImage: `url(${bgGradient})`,
+        backgroundImage: `url(${bgMain})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* 상단 네비게이션 */}
-      <header className="w-full flex justify-between items-center px-12 py-6 bg-white/30 backdrop-blur-md shadow-sm">
-        {/* 로고 */}
-        <div className="flex items-center space-x-3">
-          <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10" />
-          <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
+      {/* ================= 상단바 ================= */}
+      <header className="w-full flex justify-between items-center px-12 py-6 bg-white/30 backdrop-blur-md">
+        {/* 좌측 로고 */}
+        <div
+          className="flex items-center space-x-3 cursor-pointer"
+          onClick={() => navigate("/main")}
+        >
+          <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
+          <h1 className="text-xl italic font-semibold text-gray-800">Emodia</h1>
         </div>
 
-        {/* 로그인/시작 버튼 */}
-        <div className="flex space-x-4">
-          <button
-            onClick={handleLoginLogout}
-            className="px-5 py-2 rounded-full border border-gray-400 text-sm text-gray-800 hover:bg-gray-100"
-          >
-            {isLoggedIn ? "Logout" : "Login"}
-          </button>
-          <button
-            onClick={handleGetStarted}
-            className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm hover:bg-gray-700"
-          >
-            Get Started
-          </button>
+        {/* 중앙 메뉴 (로그인 후에만 표시) */}
+        {isLoggedIn && (
+          <nav className="flex space-x-8 text-gray-800 font-medium">
+            <button onClick={() => navigate("/about")} className="hover:text-purple-600">
+              About
+            </button>
+            <button onClick={() => navigate("/calendar")} className="hover:text-purple-600">
+              Calendar
+            </button>
+            <button onClick={() => navigate("/workout")} className="hover:text-purple-600">
+              Workout
+            </button>
+            <button onClick={() => navigate("/stats")} className="hover:text-purple-600">
+              Stats
+            </button>
+          </nav>
+        )}
+
+        {/* 우측 버튼 */}
+        <div className="flex items-center space-x-4">
+          {isLoggedIn ? (
+            <>
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
+              >
+                Log out
+              </button>
+              <button
+                onClick={() => navigate("/mypage")}
+                className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
+              >
+                My page
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900 transition"
+              >
+                Get Started
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate("/login")}
+                className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
+              >
+                Log in
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900 transition"
+              >
+                Get Started
+              </button>
+            </>
+          )}
         </div>
       </header>
 
-      {/* 메인 타이틀 */}
-      <main className="flex-grow flex flex-col items-center justify-center text-center">
-        <h1 className="text-7xl font-semibold italic text-white drop-shadow-lg">
+      {/* ================= 중앙 콘텐츠 ================= */}
+      <main className="flex flex-col items-center justify-center flex-grow text-center">
+        {/* 중앙 로고 텍스트 */}
+        <h1 className="text-6xl italic font-bold text-white mb-16 drop-shadow-lg">
           Emodia
         </h1>
 
-        {/* 중앙 메뉴 */}
-        <div className="mt-20 flex space-x-16">
-          <button
-            className="text-lg font-medium text-white hover:text-purple-200"
-            onClick={() => navigate("/about")}
-          >
+        {/* 하단 네비 메뉴 */}
+        <div className="flex space-x-12 text-white font-medium text-lg">
+          <button onClick={() => navigate("/about")} className="hover:text-purple-200">
             About
           </button>
-          <button
-            className="text-lg font-medium text-white hover:text-purple-200"
-            onClick={() => navigate("/calendar")}
-          >
+          <button onClick={() => navigate("/calendar")} className="hover:text-purple-200">
             Calendar
           </button>
-          <button
-            className="text-lg font-medium text-white hover:text-purple-200"
-            onClick={() => navigate("/workout")}
-          >
+          <button onClick={() => navigate("/main")}>
+            <img src={homeIcon} alt="Home" className="w-6 h-6 mx-2" />
+          </button>
+          <button onClick={() => navigate("/workout")} className="hover:text-purple-200">
             Workout
           </button>
-          <button
-            className="text-lg font-medium text-white hover:text-purple-200"
-            onClick={() => navigate("/stats")}
-          >
+          <button onClick={() => navigate("/stats")} className="hover:text-purple-200">
             Stats
           </button>
         </div>

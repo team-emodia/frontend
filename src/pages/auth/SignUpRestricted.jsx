@@ -1,4 +1,5 @@
-import React from "react";
+// src/pages/auth/SignUpRestricted.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // 이미지
@@ -6,17 +7,29 @@ import logoEmodia from "../../assets/logo/logo-emodia.svg";
 import logoKakao from "../../assets/logo/logo-kakao.svg";
 import logoApple from "../../assets/logo/logo-apple.svg";
 import logoGoogle from "../../assets/logo/logo-google.svg";
-import illustrationRestricted from "../../assets/illustrations/illustration-restricted-signup.svg";
+import signupBg from "../../assets/bg/signup-bg.png";
 
 const SignUpRestricted = () => {
   const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    console.log("로그인 시도:", { email, password });
+
+    // ✅ 로그인 성공 처리 예시
+    localStorage.setItem("isLoggedIn", "true");
+    navigate("/main");
+  };
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
       {/* 상단 네비게이션 */}
       <header className="flex justify-between items-center px-10 py-6">
         {/* 로고 */}
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
           <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
           <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
         </div>
@@ -29,16 +42,16 @@ const SignUpRestricted = () => {
           <button onClick={() => navigate("/stats")}>Stats</button>
         </nav>
 
-        {/* 로그인/시작 버튼 */}
+        {/* Sign up / Get Started */}
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/signup")}
             className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
           >
-            Login
+            Sign up
           </button>
           <button
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/start")}
             className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
           >
             Get Started
@@ -48,75 +61,84 @@ const SignUpRestricted = () => {
 
       {/* 메인 컨텐츠 */}
       <main className="flex flex-1 items-center justify-center px-8">
-        {/* 왼쪽 이미지 */}
+        {/* 좌측 이미지 */}
         <div className="flex-1 flex justify-center items-center">
           <img
-            src={illustrationRestricted}
-            alt="Restricted Signup Illustration"
+            src={signupBg}
+            alt="Restricted Illustration"
             className="rounded-2xl shadow-lg max-w-md"
           />
         </div>
 
-        {/* 오른쪽 폼 */}
+        {/* 우측 로그인 폼 */}
         <div className="flex-1 max-w-md">
           <p className="text-red-500 text-sm font-medium mb-2">
             로그인 후 이용해주세요
           </p>
+
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
-            Create Account
+            Nice to meet you
           </h2>
 
-          <form className="space-y-5">
-            <input
-              type="text"
-              placeholder="User Name"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-              disabled
-            />
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email */}
             <input
               type="email"
-              placeholder="Email address"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-              disabled
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              required
             />
+
+            {/* Password */}
             <input
               type="password"
-              placeholder="Password"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-              disabled
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              required
             />
 
-            {/* 회원가입 버튼 (비활성화) */}
+            {/* Forgot password (input 아래 우측 정렬) */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-sm text-purple-600 hover:underline mt-1"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* 로그인 버튼 (Gradient) */}
             <button
-              type="button"
-              disabled
-              className="w-full py-3 rounded-xl bg-purple-500 text-white font-semibold opacity-50 cursor-not-allowed"
+              type="submit"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition"
             >
-              Create Account
+              Log in
             </button>
 
-            {/* 소셜 로그인 버튼 (비활성화) */}
+            {/* 소셜 로그인 */}
             <div className="space-y-3">
               <button
                 type="button"
-                disabled
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-400 bg-gray-100 opacity-70 cursor-not-allowed"
+                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 <img src={logoKakao} alt="Kakao" className="w-5 h-5 mr-2" />
                 Login with Kakao
               </button>
               <button
                 type="button"
-                disabled
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-400 bg-gray-100 opacity-70 cursor-not-allowed"
+                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 <img src={logoApple} alt="Apple" className="w-5 h-5 mr-2" />
                 Login with Apple
               </button>
               <button
                 type="button"
-                disabled
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-400 bg-gray-100 opacity-70 cursor-not-allowed"
+                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 <img src={logoGoogle} alt="Google" className="w-5 h-5 mr-2" />
                 Login with Google

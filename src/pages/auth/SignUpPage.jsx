@@ -8,8 +8,8 @@ import logoKakao from "../../assets/logo/logo-kakao.svg";
 import logoApple from "../../assets/logo/logo-apple.svg";
 import logoGoogle from "../../assets/logo/logo-google.svg";
 
-// 회원가입 일러스트
-import illustrationSignup from "../../assets/illustrations/illustration-signup.svg";
+// 회원가입 좌측 배경 이미지
+import signupBg from "../../assets/bg/signup-bg.png";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -18,20 +18,30 @@ const SignUpPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
 
   // 회원가입 핸들러
   const handleSignUp = (e) => {
     e.preventDefault();
+
+    if (password !== passwordCheck) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     console.log("회원가입 시도:", { username, email, password });
 
-    // ✅ 회원가입 성공 시 → IntroPage(통합 페이지)로 이동
+    // ✅ 회원가입 성공 → 자동 로그인 처리
+    localStorage.setItem("token", "true"); // 로그인 상태 저장
+
+    // ✅ IntroPage(온보딩)로 이동
     navigate("/intro");
   };
 
-  // 이메일 중복확인 버튼 클릭
+  // 이메일 중복확인 버튼
   const handleCheckEmail = () => {
     console.log("중복확인 요청:", email);
-    // 🔗 여기서 실제 API 요청을 연결하면 됨 (예: fetch("/api/check-email"))
+    // 🔗 API 요청 연결 가능
   };
 
   return (
@@ -52,15 +62,12 @@ const SignUpPage = () => {
           <button onClick={() => navigate("/stats")}>Stats</button>
         </nav>
 
-        {/* 로그인 & 게스타트 */}
-        <div className="flex items-center space-x-4">
+        {/* ✅ Get Started만 유지 */}
+        <div>
           <button
-            onClick={() => navigate("/login")}
-            className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
+            onClick={() => navigate("/start")}
+            className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
           >
-            Login
-          </button>
-          <button className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">
             Get Started
           </button>
         </div>
@@ -68,16 +75,16 @@ const SignUpPage = () => {
 
       {/* ===== 메인 컨텐츠 ===== */}
       <main className="flex flex-1 items-center justify-center px-8">
-        {/* 왼쪽 일러스트 */}
+        {/* 좌측 이미지 */}
         <div className="flex-1 flex justify-center items-center">
           <img
-            src={illustrationSignup}
+            src={signupBg}
             alt="Signup Illustration"
             className="rounded-2xl shadow-lg max-w-md"
           />
         </div>
 
-        {/* 오른쪽 폼 */}
+        {/* 우측 폼 */}
         <div className="flex-1 max-w-md">
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Create Account
@@ -123,10 +130,20 @@ const SignUpPage = () => {
               required
             />
 
+            {/* Check Password */}
+            <input
+              type="password"
+              placeholder="Check the password"
+              value={passwordCheck}
+              onChange={(e) => setPasswordCheck(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              required
+            />
+
             {/* 회원가입 버튼 */}
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition"
             >
               Create Account
             </button>
