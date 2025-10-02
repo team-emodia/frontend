@@ -33,6 +33,15 @@ const LoginPage = () => {
     }
   };
 
+  // 중앙 네비 처리 (로그인 페이지에서는 무조건 restricted except About)
+  const handleNavClick = (path) => {
+    if (path === "/about") {
+      navigate("/about");
+    } else {
+      navigate("/signup/restricted");
+    }
+  };
+
   return (
     <div className="w-full h-screen flex flex-col bg-white">
       {/* ================= 상단바 ================= */}
@@ -48,16 +57,16 @@ const LoginPage = () => {
 
         {/* 중앙 메뉴 */}
         <nav className="flex space-x-8 text-gray-700 font-medium">
-          <button onClick={() => navigate("/about")} className="hover:text-purple-600">
+          <button onClick={() => handleNavClick("/about")} className="hover:text-purple-600">
             About
           </button>
-          <button onClick={() => navigate("/calendar")} className="hover:text-purple-600">
+          <button onClick={() => handleNavClick("/calendar")} className="hover:text-purple-600">
             Calendar
           </button>
-          <button onClick={() => navigate("/workout")} className="hover:text-purple-600">
+          <button onClick={() => handleNavClick("/workout")} className="hover:text-purple-600">
             Workout
           </button>
-          <button onClick={() => navigate("/stats")} className="hover:text-purple-600">
+          <button onClick={() => handleNavClick("/stats")} className="hover:text-purple-600">
             Stats
           </button>
         </nav>
@@ -71,7 +80,7 @@ const LoginPage = () => {
             Sign up
           </button>
           <button
-            onClick={() => navigate("/start")}
+            onClick={() => navigate("/signup/restricted")}
             className="px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900 transition"
           >
             Get Started
