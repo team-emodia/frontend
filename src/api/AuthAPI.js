@@ -1,20 +1,19 @@
-// src/api/AuthAPI.js
 import axios from "axios";
 
 const AUTH_BASE_URL = "http://127.0.0.1:8000/users";
 
 // 토큰 관리
-export const getAccessToken = () => localStorage.getItem("authToken");
+export const getAccessToken = () => localStorage.getItem("access");
 export const setTokens = (access, refresh) => {
-  localStorage.setItem("authToken", access);
-  if (refresh) localStorage.setItem("refreshToken", refresh);
+  localStorage.setItem("access", access);
+  localStorage.setItem("refresh", refresh);
 };
 export const removeTokens = () => {
-  localStorage.removeItem("authToken");
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
 };
 
-// 인증 관련 API
+// 로그인
 export const login = async (email, password) => {
   const response = await axios.post(`${AUTH_BASE_URL}/login/`, {
     email,
@@ -25,49 +24,20 @@ export const login = async (email, password) => {
   return response.data;
 };
 
-export const signup = async (email, password, username) => {
-  const response = await axios.post(`${AUTH_BASE_URL}/signup/`, {
+// 회원가입
+export const signup = async (username, email, password, password2) => {
+  const response = await axios.post(`${AUTH_BASE_URL}/register/`, {
+    username,
     email,
     password,
-    username,
+    password2,
   });
+  const { access, refresh } = response.data;
+  setTokens(access, refresh);
   return response.data;
 };
 
-export const logout = async () => {
-  try {
-    await axios.post(`${AUTH_BASE_URL}/logout/`, {}, {
-      headers: { Authorization: `Bearer ${getAccessToken()}` },
-    });
-  } catch (err) {
-    console.warn("서버 로그아웃 실패 (무시 가능):", err);
-  }
+// 로그아웃 (서버 X, 클라이언트만)
+export const logout = () => {
   removeTokens();
-};
-
-// (백엔드 준비 후) 프로필 조회
-export const getProfile = async () => {
-  const token = getAccessToken();
-  if (!token) return null;
-
-  try {
-    const response = await axios.get(`${AUTH_BASE_URL}/me/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  } catch (err) {
-    console.error("프로필 불러오기 실패:", err);
-    return null;
-  }
-};
-
-// ✅ default export 추가
-export default {
-  getAccessToken,
-  setTokens,
-  removeTokens,
-  login,
-  signup,
-  logout,
-  getProfile,
 };

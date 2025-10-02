@@ -92,7 +92,7 @@ const ForgotPassword = () => {
         {/* 로고 */}
         <div
           className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => navigate("/main")}
+          onClick={() => navigate("/")}
         >
           <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
           <h1 className="text-xl italic font-semibold text-gray-800">Emodia</h1>

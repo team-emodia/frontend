@@ -1,6 +1,7 @@
 // src/pages/auth/SignUpPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { signup } from "../../api/AuthAPI"; // 🔑 AuthAPI.js 사용
 
 // 로고 이미지
 import logoEmodia from "../../assets/logo/logo-emodia.svg";
@@ -50,7 +51,7 @@ const SignUpPage = () => {
         setPasswordMessage("✅ 비밀번호가 일치합니다.");
         setIsPasswordValid(true);
       } else {
-        setPasswordMessage("❌ 비밀번호가 일치하지 않습니다."); // ✅ 수정된 부분
+        setPasswordMessage("❌ 비밀번호가 일치하지 않습니다.");
         setIsPasswordValid(false);
       }
     } else {
@@ -59,19 +60,21 @@ const SignUpPage = () => {
     }
   }, [password, passwordCheck]);
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-
     if (!isPasswordValid) {
       alert("비밀번호 조건을 확인해주세요.");
       return;
     }
 
-    console.log("회원가입 시도:", { username, email, password });
-
-    localStorage.setItem("authToken", "dummy-token"); // ✅ token → authToken 통일
-
-    navigate("/intro");
+    try {
+      await signup(username, email, password, passwordCheck);
+      alert("회원가입이 완료되었습니다!");
+      navigate("/intro");
+    } catch (err) {
+      console.error(err);
+      alert("회원가입 실패: " + (err.response?.data?.detail || err.message));
+    }
   };
 
   return (
@@ -79,7 +82,7 @@ const SignUpPage = () => {
       <header className="flex justify-between items-center px-10 py-6">
         <div
           className="flex items-center cursor-pointer"
-          onClick={() => navigate("/main")}
+          onClick={() => navigate("/")}
         >
           <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
           <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
@@ -174,41 +177,6 @@ const SignUpPage = () => {
             >
               Create Account
             </button>
-
-            <div className="space-y-3">
-              <button
-                type="button"
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
-              >
-                <img src={logoKakao} alt="Kakao" className="w-5 h-5 mr-2" />
-                Login with Kakao
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
-              >
-                <img src={logoApple} alt="Apple" className="w-5 h-5 mr-2" />
-                Login with Apple
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100"
-              >
-                <img src={logoGoogle} alt="Google" className="w-5 h-5 mr-2" />
-                Login with Google
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-600 text-center">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/login")}
-                className="text-purple-600 font-medium hover:underline"
-              >
-                Login
-              </button>
-            </p>
           </form>
         </div>
       </main>

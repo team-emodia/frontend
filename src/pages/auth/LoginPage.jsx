@@ -1,6 +1,7 @@
 // src/pages/auth/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../api/AuthAPI"; // 🔑 AuthAPI.js 사용
 
 // 이미지
 import illustrationLogin from "../../assets/illustrations/illustration-login.svg";
@@ -19,25 +20,25 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // TODO: 백엔드 연동 자리
-      localStorage.setItem("authToken", "dummy-token"); // ✅ 통일된 키
-
-      navigate("/main"); // 로그인 성공 → 메인
+      await login(email, password);
+      alert("로그인 성공!");
+      // 여기에 추후 DB에서 개인맞춤설정값에 따라 intro 분기처리
+      navigate("/"); // 로그인 성공 → 메인(루트)
     } catch (error) {
-      alert("로그인 실패");
+      console.error(error);
+      alert("로그인 실패: " + (error.response?.data?.detail || error.message));
     }
   };
 
-  // 상단 네비 처리
   const handleNavClick = (path) => {
-    const isLoggedIn = !!localStorage.getItem("authToken");
+    const isLoggedIn = !!localStorage.getItem("access");
     if (path === "/about") {
       navigate("/about");
     } else {
       if (isLoggedIn) {
-        navigate(path); // 로그인 된 경우 정상 이동
+        navigate(path);
       } else {
-        navigate("/signup/restricted"); // 로그인 전 제한 페이지
+        navigate("/signup/restricted");
       }
     }
   };
@@ -46,16 +47,14 @@ const LoginPage = () => {
     <div className="w-full h-screen flex flex-col bg-white">
       {/* 상단바 */}
       <header className="w-full flex justify-between items-center px-12 py-6 bg-white shadow-sm">
-        {/* 좌측 로고 */}
         <div
           className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => navigate("/main")} // ✅ main으로 이동
+          onClick={() => navigate("/")}
         >
           <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
           <h1 className="text-lg italic font-semibold text-gray-800">Emodia</h1>
         </div>
 
-        {/* 중앙 메뉴 */}
         <nav className="flex space-x-8 text-gray-700 font-medium">
           <button onClick={() => handleNavClick("/about")} className="hover:text-purple-600">About</button>
           <button onClick={() => handleNavClick("/calendar")} className="hover:text-purple-600">Calendar</button>
@@ -63,7 +62,6 @@ const LoginPage = () => {
           <button onClick={() => handleNavClick("/stats")} className="hover:text-purple-600">Stats</button>
         </nav>
 
-        {/* 우측 버튼 */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate("/signup")}
@@ -80,9 +78,7 @@ const LoginPage = () => {
         </div>
       </header>
 
-      {/* 메인 */}
       <main className="flex flex-1 items-center justify-center px-8">
-        {/* 왼쪽 이미지 */}
         <div className="flex-1 flex justify-center items-center">
           <img
             src={illustrationLogin}
@@ -91,7 +87,6 @@ const LoginPage = () => {
           />
         </div>
 
-        {/* 오른쪽 로그인 박스 */}
         <div className="flex-1 max-w-md">
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Nice to meet you
@@ -132,22 +127,6 @@ const LoginPage = () => {
               Log in
             </button>
           </form>
-
-          {/* 소셜 로그인 */}
-          <div className="space-y-3 mt-6">
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
-              <img src={logoKakao} alt="Kakao" className="w-6 h-6" />
-              Login with Kakao
-            </button>
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
-              <img src={logoApple} alt="Apple" className="w-6 h-6" />
-              Login with Apple
-            </button>
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
-              <img src={logoGoogle} alt="Google" className="w-6 h-6" />
-              Login with Google
-            </button>
-          </div>
         </div>
       </main>
     </div>

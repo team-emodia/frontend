@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import WebcamPoseDetection from "../../components/WebcamPoseDetection";
+import { useNavigate } from "react-router-dom";
 
 const StartPage = () => {
   const [page, setPage] = useState(1);
+  const navigate = useNavigate(); 
 
   // ===== Start2 상태 =====
   const emojis = [
@@ -335,7 +337,10 @@ const StartPage = () => {
             className="w-72 p-3 border rounded-full mb-6"
           />
           <button
-            onClick={() => alert("오늘의 기록이 저장되었습니다!")}
+            onClick={() => {
+              alert("오늘의 기록이 저장되었습니다!"); 
+              navigate("/");
+            }}
             className="px-8 py-3 bg-indigo-500 text-white rounded-full"
           >
             완료
