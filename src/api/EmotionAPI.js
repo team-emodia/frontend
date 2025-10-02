@@ -45,8 +45,6 @@ export const fetchEmotionRecords = async (params = {}) => {
 
 /**
  * ✅ 감정 기록 수정
- * @param {number|string} id - 수정할 기록 ID
- * @param {Object} data - 수정할 데이터
  */
 export const updateEmotionRecord = async (id, data) => {
   try {
@@ -66,7 +64,6 @@ export const updateEmotionRecord = async (id, data) => {
 
 /**
  * ✅ 감정 기록 삭제
- * @param {number|string} id - 삭제할 기록 ID
  */
 export const deleteEmotionRecord = async (id) => {
   try {
@@ -83,12 +80,16 @@ export const deleteEmotionRecord = async (id) => {
   }
 };
 
-// ✅ eslint 경고 해결: default export는 객체를 변수에 담아 내보내기
+// ✅ 기존 코드 호환용 별칭
+export const getEmotions = fetchEmotionRecords;
+
+// ✅ default export (객체 묶음)
 const EmotionAPI = {
   saveEmotionRecord,
   fetchEmotionRecords,
   updateEmotionRecord,
   deleteEmotionRecord,
+  getEmotions, // ✅ 포함
 };
 
 export default EmotionAPI;

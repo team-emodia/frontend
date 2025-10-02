@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -15,9 +16,9 @@ import MainPage from "./pages/main/MainPage";
 import AboutPage from "./pages/main/AboutPage";
 import CalendarPage from "./pages/main/CalendarPage";
 import WorkoutPage from "./pages/main/WorkoutPage"; // ✅ default export
-import StatsPage from "./pages/main/StatsPage";
+import StatsPage from "./pages/main/StatsPage"; 
 
-// ✅ 새로 합친 StartPage.jsx
+// Start
 import StartPage from "./pages/main/StartPage";
 
 function App() {
@@ -35,7 +36,7 @@ function App() {
       <Route path="/signup-restricted" element={<SignUpRestricted />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Main */}
+      {/* Main (누구나 접근 가능) */}
       <Route path="/about" element={<AboutPage />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/workout" element={<WorkoutPage />} />

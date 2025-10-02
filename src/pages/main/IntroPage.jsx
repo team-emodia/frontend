@@ -100,7 +100,7 @@ const IntroPage = () => {
     if (currentIndex < slides.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      navigate("/main"); // 마지막 Intro 후 메인 이동
+      navigate("/"); // 마지막 Intro 후 메인 이동
     }
   };
 
@@ -313,7 +313,7 @@ const IntroPage = () => {
               {/* 하단 버튼 */}
               <div className="flex gap-4">
                 <button
-                  onClick={() => navigate("/main")}
+                  onClick={() => navigate("/")}
                   className="px-6 py-3 rounded-full bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition"
                 >
                   나중에 설정

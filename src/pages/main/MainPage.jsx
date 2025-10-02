@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // API
-import * as AuthAPI from "../../api/AuthAPI";
+import { logout, getAccessToken } from "../../api/AuthAPI"; 
+import ProfileAPI from "../../api/ProfileAPI"; // ✅ 프로필 API 추가
 
 // 로고 & 아이콘 & 배경
 import logoEmodia from "../../assets/logo/logo-emodia.svg";
@@ -14,42 +15,34 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   // 로그인 상태 및 사용자 정보
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getAccessToken());
   const [user, setUser] = useState(null);
 
-  // 페이지 진입 시 사용자 정보 확인
+  // 페이지 진입 시 로그인 상태 확인 & 프로필 불러오기
   useEffect(() => {
-    const checkUser = async () => {
-      // 1) 백엔드 준비 후: AuthAPI.getProfile() 사용
-      if (typeof AuthAPI.getProfile === "function") {
-        try {
-          const data = await AuthAPI.getProfile();
-          if (data) {
-            setIsLoggedIn(true);
-            setUser(data);
-            return;
-          }
-        } catch (err) {
-          console.warn("getProfile 호출 실패, localStorage fallback 사용:", err);
-        }
-      }
-
-      // 2) fallback: localStorage 확인
-      const token = localStorage.getItem("authToken");
+    const fetchUser = async () => {
+      const token = getAccessToken();
       if (token) {
-        setIsLoggedIn(true);
-        setUser({ username: "Guest" }); // ✅ 임시 사용자명
+        try {
+          const profile = await ProfileAPI.getProfile(); // ✅ 백엔드에서 username 불러오기
+          setUser(profile); // profile 안에는 username, email, main_goal 등 들어있음
+          setIsLoggedIn(true);
+        } catch (err) {
+          console.warn("프로필 불러오기 실패:", err);
+          setIsLoggedIn(false);
+          setUser(null);
+        }
       } else {
         setIsLoggedIn(false);
         setUser(null);
       }
     };
 
-    checkUser();
+    fetchUser();
 
     // storage 이벤트 감시 (다른 탭에서 토큰 변경 시 반영)
     const handleStorageChange = () => {
-      checkUser();
+      fetchUser();
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
@@ -58,16 +51,13 @@ const MainPage = () => {
   // 로그아웃
   const handleLogout = async () => {
     try {
-      if (typeof AuthAPI.logout === "function") {
-        await AuthAPI.logout(); // 서버 로그아웃 (백엔드 준비 후 동작)
-      }
+      logout(); // localStorage에서 토큰 제거
     } catch (error) {
-      console.warn("서버 로그아웃 실패:", error);
+      console.warn("로그아웃 처리 중 오류:", error);
     }
-    localStorage.removeItem("authToken");
     setIsLoggedIn(false);
     setUser(null);
-    navigate("/main");
+    navigate("/");
   };
 
   // Get Started 버튼
@@ -75,7 +65,7 @@ const MainPage = () => {
     if (isLoggedIn) {
       navigate("/start");
     } else {
-      navigate("/signup-restricted");
+      navigate("/login");
     }
   };
 
@@ -102,7 +92,7 @@ const MainPage = () => {
         {/* 좌측 로고 */}
         <div
           className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => navigate("/main")}
+          onClick={() => navigate("/")}
         >
           <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
           <h1 className="text-xl italic font-semibold text-gray-800">Emodia</h1>
@@ -113,7 +103,7 @@ const MainPage = () => {
           {isLoggedIn ? (
             <>
               <span className="text-white text-sm mr-2">
-                {user?.username || "User"}
+                {user?.username || "User"} {/* ✅ 실제 프로필 username */}
               </span>
               <button
                 onClick={handleLogout}
@@ -179,7 +169,7 @@ const MainPage = () => {
           </button>
 
           {/* Home */}
-          <button onClick={() => navigate("/main")}>
+          <button onClick={() => navigate("/")}>
             <img src={homeIcon} alt="Home" className="w-6 h-6 mx-2" />
           </button>
 
