@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // 배경 & 버튼 이미지
 import chartGradient from "../../assets/bg/chart-gradient.svg";
+// eslint-disable-next-line no-unused-vars
 import chartLine from "../../assets/bg/chart-line.svg";
 import buttonGradient from "../../assets/bg/button-gradient.svg";
 import exercise1 from "../../assets/bg/exercise-bg-1.svg";
@@ -12,6 +13,8 @@ import timelineDot from "../../assets/bg/timeline-dot.svg";
 
 // ✅ Stats와 연동된 컴포넌트 import
 import WeeklyMoodChart from "../../components/WeeklyMoodChart";
+// ✅ API 불러오기
+import { saveEmotionRecord } from "../../api/EmotionAPI";
 
 function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState(null);
@@ -42,16 +45,32 @@ function CalendarPage() {
     }
   };
 
-  // ✅ 저장 버튼 동작: 감정 기록 반영
-  const handleSaveRecord = () => {
+  // ✅ 저장 버튼 동작: API 연동 추가
+  const handleSaveRecord = async () => {
     if (selectedDay && selectedEmotion) {
-      setCalendarRecords({
-        ...calendarRecords,
-        [selectedDay]: selectedEmotion,
-      });
+      try {
+        // 서버로 보낼 데이터 구성
+        const payload = {
+          date: `2025-09-${String(selectedDay).padStart(2, "0")}`,
+          emotion: selectedEmotion,
+          exercises: selectedExercises,
+        };
+
+        // API 호출
+        await saveEmotionRecord(payload);
+
+        // 성공 시 로컬 상태 반영
+        setCalendarRecords({
+          ...calendarRecords,
+          [selectedDay]: selectedEmotion,
+        });
+
+        setShowNewRecord(false);
+        setShowDetail(true);
+      } catch (error) {
+        console.error("감정 기록 저장 실패:", error);
+      }
     }
-    setShowNewRecord(false);
-    setShowDetail(true);
   };
 
   // 공통 모달
@@ -126,7 +145,6 @@ function CalendarPage() {
           <div className="p-6 border rounded-2xl shadow-sm">
             <p className="font-bold text-sm">Weekly mood</p>
             <div className="mt-4">
-              {/* ✅ StatsPage와 같은 WeeklyMoodChart 삽입 */}
               <WeeklyMoodChart />
             </div>
           </div>
@@ -165,7 +183,6 @@ function CalendarPage() {
                 className="h-20 border rounded-xl flex flex-col items-center justify-center text-sm hover:bg-gradient-to-br hover:from-indigo-100 hover:to-purple-100 active:scale-95"
               >
                 <span>{i + 1}</span>
-                {/* ✅ 날짜에 저장된 감정 표시 */}
                 {calendarRecords[i + 1] && (
                   <span className="text-xl mt-1">{calendarRecords[i + 1]}</span>
                 )}

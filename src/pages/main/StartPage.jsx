@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import WebcamPoseDetection from "../../components/WebcamPoseDetection";
 
 const StartPage = () => {
   const [page, setPage] = useState(1);
@@ -218,6 +219,9 @@ const StartPage = () => {
           <h1 className="text-xl md:text-2xl font-bold mb-4">
             목·어깨 스트레칭 — 5분
           </h1>
+          <div className="w-full max-w-2xl mx-auto mb-4">
+            <WebcamPoseDetection />
+          </div>
           {/* 타이머 */}
           <div className="w-full lg:w-72 bg-white border rounded-xl shadow p-4 flex flex-col items-center">
             <p className="text-gray-700 text-sm mb-1">세션 타이머</p>
