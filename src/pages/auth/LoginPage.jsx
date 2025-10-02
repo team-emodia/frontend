@@ -12,7 +12,6 @@ import logoGoogle from "../../assets/logo/logo-google.svg";
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  // 상태
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,11 +20,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       // TODO: 백엔드 연동 자리
-      // const response = await axios.post("/api/login", { email, password });
-      // const token = response.data.token;
-
-      // 지금은 임시 토큰
-      localStorage.setItem("token", "dummy-token");
+      localStorage.setItem("authToken", "dummy-token"); // ✅ 통일된 키
 
       navigate("/main"); // 로그인 성공 → 메인
     } catch (error) {
@@ -33,14 +28,28 @@ const LoginPage = () => {
     }
   };
 
+  // 상단 네비 처리
+  const handleNavClick = (path) => {
+    const isLoggedIn = !!localStorage.getItem("authToken");
+    if (path === "/about") {
+      navigate("/about");
+    } else {
+      if (isLoggedIn) {
+        navigate(path); // 로그인 된 경우 정상 이동
+      } else {
+        navigate("/signup/restricted"); // 로그인 전 제한 페이지
+      }
+    }
+  };
+
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      {/* ================= 상단바 ================= */}
+      {/* 상단바 */}
       <header className="w-full flex justify-between items-center px-12 py-6 bg-white shadow-sm">
         {/* 좌측 로고 */}
         <div
           className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => navigate("/main")}
+          onClick={() => navigate("/main")} // ✅ main으로 이동
         >
           <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
           <h1 className="text-lg italic font-semibold text-gray-800">Emodia</h1>
@@ -48,18 +57,10 @@ const LoginPage = () => {
 
         {/* 중앙 메뉴 */}
         <nav className="flex space-x-8 text-gray-700 font-medium">
-          <button onClick={() => navigate("/about")} className="hover:text-purple-600">
-            About
-          </button>
-          <button onClick={() => navigate("/calendar")} className="hover:text-purple-600">
-            Calendar
-          </button>
-          <button onClick={() => navigate("/workout")} className="hover:text-purple-600">
-            Workout
-          </button>
-          <button onClick={() => navigate("/stats")} className="hover:text-purple-600">
-            Stats
-          </button>
+          <button onClick={() => handleNavClick("/about")} className="hover:text-purple-600">About</button>
+          <button onClick={() => handleNavClick("/calendar")} className="hover:text-purple-600">Calendar</button>
+          <button onClick={() => handleNavClick("/workout")} className="hover:text-purple-600">Workout</button>
+          <button onClick={() => handleNavClick("/stats")} className="hover:text-purple-600">Stats</button>
         </nav>
 
         {/* 우측 버튼 */}
@@ -71,7 +72,7 @@ const LoginPage = () => {
             Sign up
           </button>
           <button
-            onClick={() => navigate("/start")}
+            onClick={() => navigate("/signup/restricted")}
             className="px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900 transition"
           >
             Get Started
@@ -79,7 +80,7 @@ const LoginPage = () => {
         </div>
       </header>
 
-      {/* ================= 메인 컨텐츠 ================= */}
+      {/* 메인 */}
       <main className="flex flex-1 items-center justify-center px-8">
         {/* 왼쪽 이미지 */}
         <div className="flex-1 flex justify-center items-center">
@@ -92,12 +93,10 @@ const LoginPage = () => {
 
         {/* 오른쪽 로그인 박스 */}
         <div className="flex-1 max-w-md">
-          {/* 타이틀 */}
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Nice to meet you
           </h2>
 
-          {/* 로그인 폼 */}
           <form onSubmit={handleLogin} className="space-y-5">
             <input
               type="email"
@@ -116,7 +115,6 @@ const LoginPage = () => {
               required
             />
 
-            {/* 비밀번호 찾기 */}
             <div className="flex justify-end text-sm text-gray-600">
               <button
                 type="button"
@@ -127,7 +125,6 @@ const LoginPage = () => {
               </button>
             </div>
 
-            {/* 로그인 버튼 */}
             <button
               type="submit"
               className="w-full py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition"
@@ -136,7 +133,7 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* 소셜 로그인 버튼 */}
+          {/* 소셜 로그인 */}
           <div className="space-y-3 mt-6">
             <button className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
               <img src={logoKakao} alt="Kakao" className="w-6 h-6" />

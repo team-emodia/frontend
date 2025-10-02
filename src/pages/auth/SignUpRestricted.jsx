@@ -19,8 +19,8 @@ const SignUpRestricted = () => {
     e.preventDefault();
     console.log("로그인 시도:", { email, password });
 
-    // ✅ 로그인 성공 처리 예시
-    localStorage.setItem("isLoggedIn", "true");
+    // ✅ 로그인 성공 처리 예시 (키 통일)
+    localStorage.setItem("authToken", "true");
     navigate("/main");
   };
 
@@ -29,17 +29,28 @@ const SignUpRestricted = () => {
       {/* 상단 네비게이션 */}
       <header className="flex justify-between items-center px-10 py-6">
         {/* 로고 */}
-        <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => navigate("/main")} // ✅ 메인으로 이동
+        >
           <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
           <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
         </div>
 
         {/* 메뉴 */}
         <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-700">
-          <button onClick={() => navigate("/about")}>About</button>
-          <button onClick={() => navigate("/calendar")}>Calendar</button>
-          <button onClick={() => navigate("/workout")}>Workout</button>
-          <button onClick={() => navigate("/stats")}>Stats</button>
+          {/* 활성화 버튼 */}
+          <button
+            onClick={() => navigate("/about")}
+            className="hover:text-purple-600"
+          >
+            About
+          </button>
+
+          {/* 비활성화 버튼들 */}
+          <span className="text-gray-400 cursor-not-allowed">Calendar</span>
+          <span className="text-gray-400 cursor-not-allowed">Workout</span>
+          <span className="text-gray-400 cursor-not-allowed">Stats</span>
         </nav>
 
         {/* Sign up / Get Started */}
@@ -51,7 +62,7 @@ const SignUpRestricted = () => {
             Sign up
           </button>
           <button
-            onClick={() => navigate("/start")}
+            onClick={() => navigate("/signup/restricted")} // ✅ 수정됨
             className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
           >
             Get Started
