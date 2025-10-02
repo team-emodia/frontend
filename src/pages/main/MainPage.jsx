@@ -10,13 +10,13 @@ import bgMain from "../../assets/bg/bg-gradient-1.png";
 const MainPage = () => {
   const navigate = useNavigate();
 
-  // 로그인 상태 관리
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  // 로그인 상태 관리 (authToken으로 통일)
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
 
   // 토큰 상태 감시
   useEffect(() => {
     const checkToken = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
     };
     window.addEventListener("storage", checkToken);
     return () => window.removeEventListener("storage", checkToken);
@@ -24,7 +24,7 @@ const MainPage = () => {
 
   // 로그아웃
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("authToken"); // ✅ 통일
     setIsLoggedIn(false);
     navigate("/main"); // 로그아웃 시 메인 페이지로 이동
   };

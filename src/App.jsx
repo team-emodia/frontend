@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -29,7 +30,7 @@ function App() {
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
-      <Route path="/signup/restricted" element={<SignUpRestricted />} />
+      <Route path="/signup/restricted" element={<SignUpRestricted />} /> {/* ✅ 경로 통일 */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Main */}
@@ -39,7 +40,7 @@ function App() {
 
       {/* Calendar */}
       <Route path="/calendar" element={<CalendarPage />} /> 
-      {/* CalendarDayDetail, CalendarNewRecord는 이제 모달 팝업에서 처리 → 제거 */}
+      {/* CalendarDayDetail, CalendarNewRecord는 모달 팝업에서 처리 → 제거 */}
 
       {/* Workout & Stats */}
       <Route path="/workout" element={<Workout />} />

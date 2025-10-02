@@ -1,5 +1,5 @@
 // src/pages/auth/SignUpPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // 로고 이미지
@@ -14,58 +14,87 @@ import signupBg from "../../assets/bg/signup-bg.png";
 const SignUpPage = () => {
   const navigate = useNavigate();
 
-  // 상태 관리
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
-  // 회원가입 핸들러
+  const validatePassword = (pwd) => {
+    if (pwd.length < 8) {
+      return "❌ 비밀번호는 최소 8자리 이상이어야 합니다.";
+    }
+    if (!/[A-Za-z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+      return "❌ 비밀번호는 영문과 숫자를 모두 포함해야 합니다.";
+    }
+    return "✅ 사용 가능한 비밀번호입니다.";
+  };
+
+  useEffect(() => {
+    if (password.length === 0 && passwordCheck.length === 0) {
+      setPasswordMessage("");
+      setIsPasswordValid(false);
+      return;
+    }
+
+    const strengthMsg = validatePassword(password);
+    if (strengthMsg.includes("❌")) {
+      setPasswordMessage(strengthMsg);
+      setIsPasswordValid(false);
+      return;
+    }
+
+    if (passwordCheck.length > 0) {
+      if (password === passwordCheck) {
+        setPasswordMessage("✅ 비밀번호가 일치합니다.");
+        setIsPasswordValid(true);
+      } else {
+        setPasswordMessage("❌ 비밀번호가 일치하지 않습니다."); // ✅ 수정된 부분
+        setIsPasswordValid(false);
+      }
+    } else {
+      setPasswordMessage(strengthMsg);
+      setIsPasswordValid(false);
+    }
+  }, [password, passwordCheck]);
+
   const handleSignUp = (e) => {
     e.preventDefault();
 
-    if (password !== passwordCheck) {
-      alert("비밀번호가 일치하지 않습니다.");
+    if (!isPasswordValid) {
+      alert("비밀번호 조건을 확인해주세요.");
       return;
     }
 
     console.log("회원가입 시도:", { username, email, password });
 
-    // ✅ 회원가입 성공 → 자동 로그인 처리
-    localStorage.setItem("token", "true"); // 로그인 상태 저장
+    localStorage.setItem("authToken", "dummy-token"); // ✅ token → authToken 통일
 
-    // ✅ IntroPage(온보딩)로 이동
     navigate("/intro");
-  };
-
-  // 이메일 중복확인 버튼
-  const handleCheckEmail = () => {
-    console.log("중복확인 요청:", email);
-    // 🔗 API 요청 연결 가능
   };
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      {/* ===== 상단 로고 + 네비게이션 ===== */}
       <header className="flex justify-between items-center px-10 py-6">
-        {/* 로고 */}
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => navigate("/main")}
+        >
           <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
           <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
         </div>
 
-        {/* 상단 네비 */}
         <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-700">
           <button onClick={() => navigate("/about")}>About</button>
-          <button onClick={() => navigate("/calendar")}>Calendar</button>
-          <button onClick={() => navigate("/workout")}>Workout</button>
-          <button onClick={() => navigate("/stats")}>Stats</button>
+          <button onClick={() => navigate("/signup/restricted")}>Calendar</button>
+          <button onClick={() => navigate("/signup/restricted")}>Workout</button>
+          <button onClick={() => navigate("/signup/restricted")}>Stats</button>
         </nav>
 
-        {/* ✅ Get Started만 유지 */}
         <div>
           <button
-            onClick={() => navigate("/start")}
+            onClick={() => navigate("/signup/restricted")}
             className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
           >
             Get Started
@@ -73,9 +102,7 @@ const SignUpPage = () => {
         </div>
       </header>
 
-      {/* ===== 메인 컨텐츠 ===== */}
       <main className="flex flex-1 items-center justify-center px-8">
-        {/* 좌측 이미지 */}
         <div className="flex-1 flex justify-center items-center">
           <img
             src={signupBg}
@@ -84,14 +111,12 @@ const SignUpPage = () => {
           />
         </div>
 
-        {/* 우측 폼 */}
         <div className="flex-1 max-w-md">
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Create Account
           </h2>
 
           <form onSubmit={handleSignUp} className="space-y-5">
-            {/* User Name */}
             <input
               type="text"
               placeholder="User Name"
@@ -101,36 +126,24 @@ const SignUpPage = () => {
               required
             />
 
-            {/* Email + Check 버튼 */}
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 pr-20 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
-                required
-              />
-              <button
-                type="button"
-                onClick={handleCheckEmail}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300"
-              >
-                Check
-              </button>
-            </div>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              required
+            />
 
-            {/* Password */}
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Password (최소 8자리, 영문+숫자 포함)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
               required
             />
 
-            {/* Check Password */}
             <input
               type="password"
               placeholder="Check the password"
@@ -140,15 +153,28 @@ const SignUpPage = () => {
               required
             />
 
-            {/* 회원가입 버튼 */}
+            {passwordMessage && (
+              <p
+                className={`text-sm ${
+                  isPasswordValid ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {passwordMessage}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition"
+              disabled={!isPasswordValid}
+              className={`w-full py-3 rounded-xl text-white font-semibold transition ${
+                isPasswordValid
+                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
             >
               Create Account
             </button>
 
-            {/* 소셜 로그인 */}
             <div className="space-y-3">
               <button
                 type="button"
@@ -173,7 +199,6 @@ const SignUpPage = () => {
               </button>
             </div>
 
-            {/* 로그인 페이지 이동 */}
             <p className="text-sm text-gray-600 text-center">
               Already have an account?{" "}
               <button
