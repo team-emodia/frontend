@@ -2,17 +2,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+// 컴포넌트
+import Header from "../../common/Header";
+
 // 이미지
 import illustrationLogin from "../../assets/illustrations/illustration-login.svg";
-import logoEmodia from "../../assets/logo/logo-emodia.svg";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
-  const [method, setMethod] = useState("email"); 
+  const [method, setMethod] = useState("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState(Array(6).fill("")); 
+  const [code, setCode] = useState(Array(6).fill(""));
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -87,31 +89,8 @@ const ForgotPassword = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      {/* 상단바 */}
-      <header className="flex justify-between items-center px-12 py-6">
-        {/* 로고 */}
-        <div
-          className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
-          <h1 className="text-xl italic font-semibold text-gray-800">Emodia</h1>
-        </div>
-
-        {/* 중앙 메뉴 */}
-        <nav className="flex space-x-8 text-gray-700 font-medium">
-          <button onClick={() => navigate("/about")} className="hover:text-purple-600">About</button>
-          <button onClick={() => navigate("/signup/restricted")} className="hover:text-purple-600">Calendar</button>
-          <button onClick={() => navigate("/signup/restricted")} className="hover:text-purple-600">Workout</button>
-          <button onClick={() => navigate("/signup/restricted")} className="hover:text-purple-600">Stats</button>
-        </nav>
-
-        {/* 우측 버튼 */}
-        <div className="flex space-x-4">
-          <button onClick={() => navigate("/login")} className="px-4 py-2 rounded-full border border-gray-300 text-gray-800 hover:bg-gray-100">Login</button>
-          <button onClick={() => navigate("/signup/restricted")} className="px-4 py-2 rounded-full bg-gray-900 text-white hover:bg-gray-800">Get Started</button>
-        </div>
-      </header>
+      {/* ✅ 헤더 교체 */}
+      <Header variant="login" />
 
       {/* 메인 */}
       <main className="flex flex-1 items-center justify-center px-8">
@@ -127,7 +106,9 @@ const ForgotPassword = () => {
 
           {/* 오른쪽 폼 */}
           <div className="flex-1 max-w-md">
-            <h2 className="text-2xl font-bold mb-2 text-gray-900">비밀번호 재설정</h2>
+            <h2 className="text-2xl font-bold mb-2 text-gray-900">
+              비밀번호 재설정
+            </h2>
             <p className="text-gray-600 mb-6 text-sm">
               계정에 접근할 수 있도록 아래 방법 중 하나를 선택하세요
             </p>
@@ -158,7 +139,10 @@ const ForgotPassword = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-sm w-[320px]">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 text-sm w-[320px]"
+            >
               {/* 이메일 or 전화번호 */}
               {method === "email" ? (
                 <input
@@ -182,7 +166,9 @@ const ForgotPassword = () => {
 
               {/* 인증 코드 */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">인증 코드</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  인증 코드
+                </label>
                 <div className="flex space-x-2">
                   {code.map((c, idx) => (
                     <input
@@ -207,13 +193,19 @@ const ForgotPassword = () => {
                       : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                   }`}
                 >
-                  {!sent ? "인증 코드 보내기" : isCounting ? `재전송 (${timer}s)` : "재전송"}
+                  {!sent
+                    ? "인증 코드 보내기"
+                    : isCounting
+                    ? `재전송 (${timer}s)`
+                    : "재전송"}
                 </button>
               </div>
 
               {/* 새 비밀번호 */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">새 비밀번호</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  새 비밀번호
+                </label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? "text" : "password"}
@@ -235,7 +227,9 @@ const ForgotPassword = () => {
 
               {/* 비밀번호 확인 */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">비밀번호 확인</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  비밀번호 확인
+                </label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
@@ -266,7 +260,10 @@ const ForgotPassword = () => {
 
             {/* 하단 링크 */}
             <div className="text-center mt-4 space-y-1">
-              <button type="button" className="text-xs text-gray-500 underline hover:text-gray-700">
+              <button
+                type="button"
+                className="text-xs text-gray-500 underline hover:text-gray-700"
+              >
                 고객센터 문의
               </button>
               <div>
