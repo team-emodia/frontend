@@ -1,12 +1,17 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 import * as tf from "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
+import { startWorkoutSession, endWorkoutSession, submitPoseFrame } from "../api/WorkoutAPI";
 
-const WebcamPoseDetection = () => {
+const WebcamPoseDetection = ({ sportsId = 1 }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const sessionIdRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const [feedback, setFeedback] = useState(null);
+  const sessionInitialized = useRef(false);
 
   // 상체 주요 랜드마크
   const UPPER_BODY_LANDMARKS = [
@@ -35,7 +40,7 @@ const WebcamPoseDetection = () => {
     await tf.setBackend("webgl");
     await tf.ready();
     const detectorConfig = {
-      modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+      modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
     };
     const detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
@@ -60,27 +65,46 @@ const WebcamPoseDetection = () => {
       webcamRef.current.video.height = videoHeight;
 
       const poses = await detector.estimatePoses(video);
-      drawCanvas(poses, videoWidth, videoHeight, canvasRef);
-    }
-  };
 
-  // 📌 자세 비교 함수
-  const comparePose = (keypoints, tolerance = 0.1) => {
-    let allMatch = true;
-    for (const name of UPPER_BODY_LANDMARKS) {
-      const kp = keypoints.find((k) => k.name === name);
-      const ref = REFERENCE_POSE[name];
-      if (kp && ref) {
-        // 정규화 좌표 (0~1) 기준 비교
-        const dx = kp.x / 640 - ref[0]; // 640은 임의, 실제 width로 normalize해도 됨
-        const dy = kp.y / 480 - ref[1];
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > tolerance) {
-          allMatch = false;
+      // 포즈 좌표 전송
+      if (poses && poses.length > 0) {
+        const sessionId = sessionIdRef.current;
+        const startTime = startTimeRef.current;
+
+        if (sessionId && startTime) {
+          const keypoints = poses[0].keypoints
+            .filter(kp => kp.score > 0.3)  // 신뢰도 낮은 것 제외
+            .map(kp => ({
+              name: kp.name,
+              x: parseFloat((1 - kp.x / videoWidth).toFixed(4)),  // 좌우 반전 + 정규화
+              y: parseFloat((kp.y / videoHeight).toFixed(4)),
+              score: parseFloat(kp.score.toFixed(3))
+            }));
+
+          const timestamp = parseFloat(((Date.now() - startTime) / 1000).toFixed(2));
+
+          // 0.5초마다 전송 (부하 감소)
+          const shouldSend = Math.floor(timestamp * 2) !== Math.floor((timestamp - 0.1) * 2);
+
+          if (shouldSend && keypoints.length > 0) {
+            console.log('포즈 전송 중... timestamp:', timestamp, 'keypoints:', keypoints.length);
+            submitPoseFrame(sessionId, timestamp, keypoints)
+              .then(data => {
+                console.log('서버 응답:', data);
+                if (data && data.feedback) {
+                  setFeedback(data.feedback);
+                  console.log('피드백 설정:', data.feedback);
+                }
+              })
+              .catch(err => {
+                console.error('포즈 전송 실패:', err.response?.data || err.message);
+              });
+          }
         }
       }
+
+      drawCanvas(poses, videoWidth, videoHeight, canvasRef);
     }
-    return allMatch;
   };
 
   const drawCanvas = (poses, videoWidth, videoHeight, canvas) => {
@@ -90,20 +114,6 @@ const WebcamPoseDetection = () => {
 
     if (poses && poses.length > 0) {
       const keypoints = poses[0].keypoints;
-
-      // ✅ 자세 일치 여부 확인
-      const isMatch = comparePose(keypoints);
-
-      // 텍스트 표시
-      ctx.save();
-      ctx.scale(-1, 1);
-
-      // 좌우 뒤집힌 좌표계니까, x좌표를 영상 너비만큼 빼줘야 함
-      ctx.font = "30px Arial";
-      ctx.fillStyle = isMatch ? "lime" : "red";
-      ctx.fillText(isMatch ? "MATCH" : "NOT MATCH", -videoWidth + 50, 50);
-
-      ctx.restore();
 
       // 관절 표시
       UPPER_BODY_LANDMARKS.forEach((keypointName) => {
@@ -122,29 +132,68 @@ const WebcamPoseDetection = () => {
   };
 
   useEffect(() => {
+    if (sessionInitialized.current) return;
+    sessionInitialized.current = true;
+
+    let currentSessionId = null;
+
     setup();
+
+    // 세션 시작
+    startWorkoutSession(sportsId)
+      .then(data => {
+        currentSessionId = data.id;
+        sessionIdRef.current = data.id;
+        startTimeRef.current = Date.now();
+        console.log('세션 시작됨:', data.id);
+      })
+      .catch(err => console.error("세션 시작 실패:", err));
+
+    // 컴포넌트 unmount 시 세션 종료
+    return () => {
+      if (currentSessionId) {
+        console.log('세션 종료:', currentSessionId);
+        endWorkoutSession(currentSessionId).catch(err => console.error(err));
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative max-w-2xl mx-auto">
       <Webcam
         ref={webcamRef}
         mirrored={true}
         className="rounded-lg"
         style={{
-          width: "100%",
-          height: "auto",
+          width: "640px",
+          height: "480px",
         }}
       />
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0"
         style={{
-          width: "100%",
-          height: "100%",
+          width: "640px",
+          height: "480px",
           transform: "scaleX(-1)",
         }}
       />
+
+      {/* 실시간 피드백 표시 */}
+      {feedback && (
+        <div className="absolute top-4 right-4 bg-black bg-opacity-70 text-white p-4 rounded-lg max-w-xs">
+          <div className={`font-bold mb-2 ${
+            feedback.status === 'good' ? 'text-green-400' :
+            feedback.status === 'warning' ? 'text-yellow-400' : 'text-red-400'
+          }`}>
+            {feedback.status === 'good' ? '✓ 좋습니다!' : '⚠ 교정이 필요합니다'}
+          </div>
+          {feedback.messages && feedback.messages.map((msg, idx) => (
+            <div key={idx} className="text-sm">{msg}</div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
