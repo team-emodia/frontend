@@ -23,12 +23,111 @@ export const saveWorkoutRecord = async (data) => {
   }
 };
 
-// 나중에 필요할 수 있는 다른 함수도 이 패턴으로 추가 가능
-// ex) fetchWorkoutRecords, updateWorkoutRecord, deleteWorkoutRecord
+/**
+ * 운동 세션 시작
+ * @param {number} sportsId - 스포츠 ID
+ */
+export const startWorkoutSession = async (sportsId) => {
+  try {
+    const token = localStorage.getItem("access");
+    console.log('세션 시작 요청:', { sports: sportsId, token: token ? '있음' : '없음' });
+    const response = await axios.post(
+      `${API_BASE_URL}/workout/start/`,
+      { sports: sportsId },
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ 세션 시작 실패:", error);
+    console.error("에러 상세:", JSON.stringify(error.response?.data, null, 2));
+    console.error("Status:", error.response?.status);
+    throw error;
+  }
+};
+
+/**
+ * 운동 세션 종료
+ * @param {number} sessionId - 세션 ID
+ */
+export const endWorkoutSession = async (sessionId) => {
+  try {
+    const token = localStorage.getItem("access");
+    const response = await axios.patch(
+      `${API_BASE_URL}/workout/${sessionId}/end/`,
+      {},
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ 세션 종료 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 포즈 좌표 전송 + 피드백 받기
+ * @param {number} sessionId - 세션 ID
+ * @param {number} timestamp - 타임스탬프
+ * @param {Array} keypoints - 포즈 키포인트 [{name, x, y, score}, ...]
+ */
+export const submitPoseFrame = async (sessionId, timestamp, keypoints) => {
+  try {
+    const token = localStorage.getItem("access");
+    const response = await axios.post(
+      `${API_BASE_URL}/pose/submit/`,
+      {
+        session: sessionId,
+        timestamp: timestamp,
+        keypoints: keypoints,
+      },
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ 포즈 전송 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 운동 세션 목록 조회
+ */
+export const getWorkoutSessions = async () => {
+  try {
+    const token = localStorage.getItem("access");
+    const response = await axios.get(`${API_BASE_URL}/workout/sessions/`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ 세션 목록 조회 실패:", error);
+    throw error;
+  }
+};
 
 // ✅ eslint 경고 방지: default export는 변수에 담아 내보내기
 const WorkoutAPI = {
   saveWorkoutRecord,
+  startWorkoutSession,
+  endWorkoutSession,
+  submitPoseFrame,
+  getWorkoutSessions,
 };
 
 export default WorkoutAPI;
