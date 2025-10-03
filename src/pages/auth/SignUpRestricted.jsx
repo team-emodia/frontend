@@ -3,7 +3,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../api/AuthAPI"; // 🔑 AuthAPI.js 사용
 
-import logoEmodia from "../../assets/logo/logo-emodia.svg";
+// 컴포넌트
+import Header from "../../common/Header";
+
+// 이미지
 import logoKakao from "../../assets/logo/logo-kakao.svg";
 import logoApple from "../../assets/logo/logo-apple.svg";
 import logoGoogle from "../../assets/logo/logo-google.svg";
@@ -29,39 +32,8 @@ const SignUpRestricted = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      <header className="flex justify-between items-center px-10 py-6">
-        <div
-          className="flex items-center cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
-          <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
-        </div>
-
-        <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-700">
-          <button onClick={() => navigate("/about")} className="hover:text-purple-600">
-            About
-          </button>
-          <span className="text-gray-400 cursor-not-allowed">Calendar</span>
-          <span className="text-gray-400 cursor-not-allowed">Workout</span>
-          <span className="text-gray-400 cursor-not-allowed">Stats</span>
-        </nav>
-
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate("/signup")}
-            className="px-5 py-2 rounded-full border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
-          >
-            Sign up
-          </button>
-          <button
-            onClick={() => navigate("/signup/restricted")}
-            className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
-          >
-            Get Started
-          </button>
-        </div>
-      </header>
+      {/* ✅ 헤더 교체 */}
+      <Header variant="signup" />
 
       <main className="flex flex-1 items-center justify-center px-8">
         <div className="flex-1 flex justify-center items-center">

@@ -1,20 +1,19 @@
 // src/pages/auth/SignUpPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { signup } from "../../api/AuthAPI"; // 🔑 AuthAPI.js 사용
+import { signup } from "../../api/AuthAPI";
 
-// 로고 이미지
-import logoEmodia from "../../assets/logo/logo-emodia.svg";
+// 이미지
+import signupBg from "../../assets/bg/signup-bg.png";
 import logoKakao from "../../assets/logo/logo-kakao.svg";
 import logoApple from "../../assets/logo/logo-apple.svg";
 import logoGoogle from "../../assets/logo/logo-google.svg";
 
-// 회원가입 좌측 배경 이미지
-import signupBg from "../../assets/bg/signup-bg.png";
+// 공통 Header
+import Header from "../../common/Header";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,12 +22,9 @@ const SignUpPage = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const validatePassword = (pwd) => {
-    if (pwd.length < 8) {
-      return "❌ 비밀번호는 최소 8자리 이상이어야 합니다.";
-    }
-    if (!/[A-Za-z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+    if (pwd.length < 8) return "❌ 비밀번호는 최소 8자리 이상이어야 합니다.";
+    if (!/[A-Za-z]/.test(pwd) || !/[0-9]/.test(pwd))
       return "❌ 비밀번호는 영문과 숫자를 모두 포함해야 합니다.";
-    }
     return "✅ 사용 가능한 비밀번호입니다.";
   };
 
@@ -79,33 +75,12 @@ const SignUpPage = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      <header className="flex justify-between items-center px-10 py-6">
-        <div
-          className="flex items-center cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <img src={logoEmodia} alt="Emodia Logo" className="w-10 h-10 mr-3" />
-          <h1 className="text-xl italic font-semibold text-gray-900">Emodia</h1>
-        </div>
+      {/* 상단바 (signup 모드) */}
+      <Header variant="signup" />
 
-        <nav className="hidden md:flex space-x-10 text-sm font-medium text-gray-700">
-          <button onClick={() => navigate("/about")}>About</button>
-          <button onClick={() => navigate("/signup/restricted")}>Calendar</button>
-          <button onClick={() => navigate("/signup/restricted")}>Workout</button>
-          <button onClick={() => navigate("/signup/restricted")}>Stats</button>
-        </nav>
-
-        <div>
-          <button
-            onClick={() => navigate("/signup/restricted")}
-            className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
-          >
-            Get Started
-          </button>
-        </div>
-      </header>
-
+      {/* 메인 */}
       <main className="flex flex-1 items-center justify-center px-8">
+        {/* 왼쪽 이미지 */}
         <div className="flex-1 flex justify-center items-center">
           <img
             src={signupBg}
@@ -114,6 +89,7 @@ const SignUpPage = () => {
           />
         </div>
 
+        {/* 오른쪽 회원가입 폼 */}
         <div className="flex-1 max-w-md">
           <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
             Create Account
@@ -178,6 +154,33 @@ const SignUpPage = () => {
               Create Account
             </button>
           </form>
+
+          {/* 소셜 로그인 */}
+          <div className="mt-6 space-y-3">
+            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
+              <img src={logoKakao} alt="Kakao" className="w-5 h-5 mr-2" />
+              Login with Kakao
+            </button>
+            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
+              <img src={logoApple} alt="Apple" className="w-5 h-5 mr-2" />
+              Login with Apple
+            </button>
+            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
+              <img src={logoGoogle} alt="Google" className="w-5 h-5 mr-2" />
+              Login with Google
+            </button>
+          </div>
+
+          {/* 로그인 페이지 이동 */}
+          <div className="mt-6 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate("/login")}
+              className="text-purple-600 font-medium hover:underline"
+            >
+              Log in
+            </button>
+          </div>
         </div>
       </main>
     </div>
