@@ -1,7 +1,7 @@
 // src/pages/auth/LoginPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../api/AuthAPI";
+import { login, getAccessToken } from "../../api/AuthAPI";
 
 // 이미지
 import illustrationLogin from "../../assets/illustrations/illustration-login.svg";
@@ -17,13 +17,20 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // 로그인된 상태면 메인으로 리다이렉트
+  useEffect(() => {
+    if (getAccessToken()) {
+      navigate("/main", { replace: true });
+    }
+  }, [navigate]);
+
   // 로그인 처리
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
       alert("로그인 성공!");
-      navigate("/");
+      window.location.href = "/main"; // 페이지 새로고침으로 헤더 업데이트
     } catch (error) {
       console.error(error);
       alert("로그인 실패: " + (error.response?.data?.detail || error.message));
@@ -32,8 +39,8 @@ const LoginPage = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-white">
-      {/* 상단바 (login 모드) */}
-      <Header variant="login" />
+      {/* 상단바 */}
+      <Header variant="default" />
 
       {/* 메인 */}
       <main className="flex flex-1 items-center justify-center px-8">

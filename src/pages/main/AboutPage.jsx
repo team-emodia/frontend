@@ -84,15 +84,7 @@ const AboutPage = () => {
           ))}
         </div>
 
-        {/* 회원가입 버튼 */}
-        <div className="mt-16">
-          <button
-            onClick={() => navigate("/signup")}
-            className="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
-          >
-            회원가입 후 시작하기
-          </button>
-        </div>
+
       </main>
 
       {/* ================= 모달 ================= */}

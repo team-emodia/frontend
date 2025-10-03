@@ -36,9 +36,21 @@ const Header = ({ variant = "default" }) => {
     };
 
     fetchUser();
-    window.addEventListener("storage", fetchUser);
-    return () => window.removeEventListener("storage", fetchUser);
   }, [variant]);
+
+  // 토큰 변경 감지
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = getAccessToken();
+      setIsLoggedIn(!!token);
+      if (!token) {
+        setUser(null);
+      }
+    };
+
+    const interval = setInterval(checkAuth, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -53,26 +65,27 @@ const Header = ({ variant = "default" }) => {
   };
 
   return (
-    <header className="w-full flex justify-between items-center px-12 py-6 bg-white shadow-sm">
+    <header className="w-full flex items-center px-12 py-6 bg-white shadow-sm">
       {/* 좌측 로고 */}
       <div
         className="flex items-center space-x-3 cursor-pointer"
         onClick={() => navigate("/")}
       >
         <img src={logoEmodia} alt="Emodia Logo" className="w-8 h-8" />
-        <h1 className="text-lg italic font-semibold text-gray-800">Emodia</h1>
+        <h1 className="text-xl italic font-semibold text-gray-800">Emodia</h1>
       </div>
 
       {/* variant 분기 */}
       {variant === "default" && (
         <>
-          {/* 중앙 네비 */}
-          <nav className="flex space-x-8 text-gray-700 font-medium">
-            <button onClick={() => navigate("/about")}>About</button>
+          {/* 중앙 네비 - 절대 중앙 고정 */}
+          <nav className="flex space-x-10 text-lg font-medium absolute left-1/2 transform -translate-x-1/2">
+            <button onClick={() => navigate("/about")} className="text-gray-700 hover:text-purple-500">About</button>
             <button
               onClick={() =>
                 isLoggedIn ? navigate("/calendar") : navigate("/login")
               }
+              className="text-gray-700 hover:text-purple-500"
             >
               Calendar
             </button>
@@ -80,6 +93,7 @@ const Header = ({ variant = "default" }) => {
               onClick={() =>
                 isLoggedIn ? navigate("/workout") : navigate("/login")
               }
+              className="text-gray-700 hover:text-purple-500"
             >
               Workout
             </button>
@@ -87,13 +101,14 @@ const Header = ({ variant = "default" }) => {
               onClick={() =>
                 isLoggedIn ? navigate("/stats") : navigate("/login")
               }
+              className="text-gray-700 hover:text-purple-500"
             >
               Stats
             </button>
           </nav>
 
           {/* 우측 버튼 */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ml-auto">
             {isLoggedIn ? (
               <>
                 <span className="text-sm text-gray-700">

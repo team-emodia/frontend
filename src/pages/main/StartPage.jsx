@@ -1,6 +1,7 @@
 // src/pages/main/StartPage.jsx
 import React, { useState, useEffect } from "react";
 import WebcamPoseDetection from "../../components/WebcamPoseDetection";
+import EmotionRecorder from "../../components/EmotionRecorder";
 import { useNavigate } from "react-router-dom";
 import buttonGradient from "../../assets/bg/button-gradient.svg";
 
@@ -16,28 +17,13 @@ const StartPage = () => {
   const [useWebcam, setUseWebcam] = useState(false);
   const navigate = useNavigate();
 
-  // ===== Start2 상태 =====
-  const emojis = [
-    { name: "행복", icon: "😊" },
-    { name: "설렘", icon: "🥰" },
-    { name: "차분", icon: "😌" },
-    { name: "보통", icon: "😐" },
-    { name: "분노", icon: "😡" },
-    { name: "불안", icon: "😟" },
-    { name: "지침", icon: "😩" },
-    { name: "우울", icon: "😔" },
-  ];
-  const [selectedEmoji, setSelectedEmoji] = useState("지침");
-  const [intensity, setIntensity] = useState(50);
-  const [memo, setMemo] = useState("");
-  const [selectedMemos, setSelectedMemos] = useState([]);
-  const toggleMemo = (memoItem) => {
-    setSelectedMemos((prev) =>
-      prev.includes(memoItem)
-        ? prev.filter((item) => item !== memoItem)
-        : [...prev, memoItem]
-    );
-  };
+  // ===== Start2 상태 (감정 기록 데이터) =====
+  const [emotionData, setEmotionData] = useState({
+    selectedEmoji: "지침",
+    intensity: 50,
+    memo: "",
+    selectedMemos: [],
+  });
 
   // ===== Start3 상태 =====
   const [activeTab, setActiveTab] = useState("스트레칭");
@@ -76,7 +62,13 @@ const StartPage = () => {
   const [voiceOfMind, setVoiceOfMind] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ 저장 핸들러
+  // ✅ 감정 기록 저장 핸들러
+  const handleEmotionSave = (data) => {
+    setEmotionData(data);
+    setPage(3); // 다음 페이지로 이동
+  };
+
+  // ✅ 최종 저장 핸들러
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -84,10 +76,10 @@ const StartPage = () => {
 
       await saveEmotionRecord({
         date,
-        emotion: selectedEmoji,
-        intensity,
-        memo,
-        tags: selectedMemos,
+        emotion: emotionData.selectedEmoji,
+        intensity: emotionData.intensity,
+        memo: emotionData.memo,
+        tags: emotionData.selectedMemos,
         moodAfter: selectedMood,
         voiceOfMind,
       });
@@ -134,69 +126,12 @@ const StartPage = () => {
         <div className="flex flex-col min-h-screen bg-gray-50">
           <Header variant="default" />
           <main className="flex flex-1 flex-col items-center justify-center p-6">
-            <h2 className="text-xl font-bold mb-4">오늘 기분은 어떤가요?</h2>
-            <div className="grid grid-cols-4 gap-4 mb-6">
-              {emojis.map((e) => (
-                <button
-                  key={e.name}
-                  onClick={() => setSelectedEmoji(e.name)}
-                  className={`flex flex-col items-center p-4 rounded-lg border ${
-                    selectedEmoji === e.name ? "bg-indigo-100" : "bg-white"
-                  }`}
-                >
-                  <span className="text-3xl">{e.icon}</span>
-                  <span className="text-sm mt-2">{e.name}</span>
-                </button>
-              ))}
-            </div>
-
-            <label className="mb-2">강도: {intensity}</label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={intensity}
-              onChange={(e) => setIntensity(Number(e.target.value))}
-              className="w-64 mb-6"
+            <EmotionRecorder
+              initialData={emotionData}
+              onSave={handleEmotionSave}
+              onCancel={() => setPage(1)}
+              showDetails={false}
             />
-
-            <textarea
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              placeholder="메모를 입력하세요"
-              className="w-80 p-3 border rounded-lg mb-6"
-            />
-
-            <div className="flex flex-wrap gap-2 mb-8">
-              {["업무", "휴식", "가족", "운동", "수면", "식사"].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => toggleMemo(item)}
-                  className={`py-2 px-4 rounded-full border transition-colors ${
-                    selectedMemos.includes(item)
-                      ? "bg-indigo-500 text-white border-indigo-500"
-                      : "bg-gray-100 text-gray-700 border-gray-300"
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex justify-between w-80">
-              <button
-                onClick={() => setPage(1)}
-                className="py-3 px-8 border rounded-full"
-              >
-                이전
-              </button>
-              <button
-                onClick={() => setPage(3)}
-                className="py-3 px-8 bg-indigo-500 text-white font-bold rounded-full hover:bg-indigo-600"
-              >
-                다음
-              </button>
-            </div>
           </main>
         </div>
       )}

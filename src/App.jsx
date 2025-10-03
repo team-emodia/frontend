@@ -13,6 +13,7 @@ import IntroPage from "./pages/main/IntroPage";
 import AboutPage from "./pages/main/AboutPage";
 import CalendarPage from "./pages/main/CalendarPage";
 import WorkoutPage from "./pages/main/WorkoutPage";
+import WorkoutDetailPage from "./pages/main/WorkoutDetailPage";
 import StatsPage from "./pages/main/StatsPage";
 import StartPage from "./pages/main/StartPage";
 
@@ -31,11 +32,12 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/workout" element={<WorkoutPage />} />
+      <Route path="/workout/detail/:id" element={<WorkoutDetailPage />} />
       <Route path="/stats" element={<StatsPage />} />
       <Route path="/start" element={<StartPage />} />
 
-      {/* 기본 루트 → 로그인 페이지 */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* 기본 루트 → 메인 페이지 */}
+      <Route path="*" element={<Navigate to="/main" replace />} />
     </Routes>
   );
 }

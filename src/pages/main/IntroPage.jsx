@@ -437,13 +437,17 @@ const IntroPage = () => {
                 >
                   이전
                 </button>
-                <button
-                  onClick={() => navigate("/")}
-                  className="px-6 py-3 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition"
-                >
-                  나중에 설정
-                </button>
-                <GradientButton text="다음" onClick={handleNext} />
+                  <button
+                      onClick={() => navigate("/"
+                      )}
+                      className="px-6 py-3
+                      rounded-full bg-red-500 text-white
+                       font-semibold hover:bg-red-600
+                       transition"
+                      >
+                      나중에 설정
+                  </button>
+                          <GradientButton text="다음" onClick={handleNext} />
               </div>
             </>
           )}

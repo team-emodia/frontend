@@ -121,6 +121,24 @@ export const getWorkoutSessions = async () => {
   }
 };
 
+/**
+ * Sports 목록 및 비디오 조회
+ */
+export const fetchWorkoutVideos = async () => {
+  try {
+    const token = localStorage.getItem("access");
+    const response = await axios.get(`${API_BASE_URL}/sports/`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ Workout 비디오 조회 실패:", error);
+    throw error;
+  }
+};
+
 // ✅ eslint 경고 방지: default export는 변수에 담아 내보내기
 const WorkoutAPI = {
   saveWorkoutRecord,
@@ -128,6 +146,7 @@ const WorkoutAPI = {
   endWorkoutSession,
   submitPoseFrame,
   getWorkoutSessions,
+  fetchWorkoutVideos,
 };
 
 export default WorkoutAPI;
