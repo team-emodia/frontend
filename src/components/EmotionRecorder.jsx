@@ -3,17 +3,17 @@ import React, { useState } from "react";
 
 const EmotionRecorder = ({ onSave, onCancel, initialData = {}, showDetails = true }) => {
   const emojis = [
-    { name: "행복", icon: "😊" },
-    { name: "설렘", icon: "🥰" },
-    { name: "차분", icon: "😌" },
-    { name: "보통", icon: "😐" },
-    { name: "분노", icon: "😡" },
-    { name: "불안", icon: "😟" },
-    { name: "지침", icon: "😩" },
-    { name: "우울", icon: "😔" },
+    { id: "happy", name: "행복", icon: "😊" },
+    { id: "excited", name: "설렘", icon: "🥰" },
+    { id: "calm", name: "차분", icon: "😌" },
+    { id: "neutral", name: "보통", icon: "😐" },
+    { id: "angry", name: "분노", icon: "😡" },
+    { id: "anxious", name: "불안", icon: "😟" },
+    { id: "tired", name: "지침", icon: "😩" },
+    { id: "sad", name: "우울", icon: "😔" },
   ];
 
-  const [selectedEmoji, setSelectedEmoji] = useState(initialData.selectedEmoji || "지침");
+  const [selectedEmoji, setSelectedEmoji] = useState(initialData.selectedEmoji || "tired");
   const [intensity, setIntensity] = useState(initialData.intensity || 50);
   const [memo, setMemo] = useState(initialData.memo || "");
   const [selectedMemos, setSelectedMemos] = useState(initialData.selectedMemos || []);
@@ -27,8 +27,10 @@ const EmotionRecorder = ({ onSave, onCancel, initialData = {}, showDetails = tru
   };
 
   const handleSave = () => {
+    const selectedEmojiName = emojis.find(e => e.id === selectedEmoji)?.name || "";
     onSave({
-      selectedEmoji,
+      selectedEmoji: selectedEmoji, // 이제 id (영어)
+      selectedEmojiName: selectedEmojiName, // 이름 (한글)
       intensity,
       memo,
       selectedMemos,
@@ -43,9 +45,9 @@ const EmotionRecorder = ({ onSave, onCancel, initialData = {}, showDetails = tru
         {emojis.map((e) => (
           <button
             key={e.name}
-            onClick={() => setSelectedEmoji(e.name)}
+            onClick={() => setSelectedEmoji(e.id)}
             className={`flex flex-col items-center p-4 rounded-lg border ${
-              selectedEmoji === e.name ? "bg-indigo-100" : "bg-white"
+              selectedEmoji === e.id ? "bg-indigo-100" : "bg-white"
             }`}
           >
             <span className="text-3xl">{e.icon}</span>

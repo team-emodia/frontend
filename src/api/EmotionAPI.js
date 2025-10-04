@@ -10,7 +10,8 @@ const API_BASE_URL = "http://127.0.0.1:8000/api";
 export const saveEmotionRecord = async (data) => {
   try {
     const token = localStorage.getItem("access");
-    const response = await axios.post(`${API_BASE_URL}/emotions/`, data, {
+    // ✅ URL을 'save' 엔드포인트로 변경
+    const response = await axios.post(`${API_BASE_URL}/emotions/save/`, data, {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
         "Content-Type": "application/json",
