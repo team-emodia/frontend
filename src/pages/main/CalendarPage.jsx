@@ -28,6 +28,8 @@ function CalendarPage() {
   // ✅ 추가된 상태
   const [selectedEmotion, setSelectedEmotion] = useState(null);
   const [calendarRecords, setCalendarRecords] = useState({});
+  const [allRecords, setAllRecords] = useState([]); // 전체 기록 저장
+  const [existingRecord, setExistingRecord] = useState(null); // 선택된 날짜의 기록
 
   // 현재 날짜 상태
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -62,13 +64,13 @@ function CalendarPage() {
 
   const emotions = [
     { symbol: "😊", label: "행복", value: "happy" },
-    { symbol: "🤩", label: "설렘", value: "excited" },
+    { symbol: "🥰", label: "설렘", value: "excited" },
     { symbol: "😌", label: "차분", value: "calm" },
     { symbol: "😐", label: "보통", value: "neutral" },
     { symbol: "😡", label: "분노", value: "angry" },
-    { symbol: "😰", label: "불안", value: "anxious" },
-    { symbol: "🥱", label: "지침", value: "tired" },
-    { symbol: "😰", label: "우울", value: "sad" },
+    { symbol: "😟", label: "불안", value: "anxious" },
+    { symbol: "😩", label: "지침", value: "tired" },
+    { symbol: "😔", label: "우울", value: "sad" },
   ];
 
   // 감정 기록 불러오기
@@ -76,6 +78,8 @@ function CalendarPage() {
     const loadEmotionRecords = async () => {
       try {
         const records = await fetchEmotionRecords();
+        setAllRecords(records); // 전체 기록 저장
+
         const recordsMap = {};
 
         records.forEach(record => {
@@ -93,6 +97,50 @@ function CalendarPage() {
 
     loadEmotionRecords();
   }, [year, month]);
+
+  // 감정을 점수로 변환 (0~100)
+  const emotionToScore = (emotionValue) => {
+    const scoreMap = {
+      'sad': 0,
+      'tired': 14,
+      'anxious': 28,
+      'angry': 42,
+      'neutral': 57,
+      'calm': 71,
+      'excited': 85,
+      'happy': 100
+    };
+    return scoreMap[emotionValue] || 50;
+  };
+
+  // 최근 7일 데이터 계산
+  const getWeeklyData = () => {
+    const today = new Date();
+    const labels = [];
+    const dataPoints = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      const dateString = date.toISOString().split('T')[0];
+      const dayLabel = `${date.getMonth() + 1}/${date.getDate()}`;
+
+      labels.push(dayLabel);
+
+      // 해당 날짜의 기록 찾기
+      const record = allRecords.find(r => r.date === dateString);
+      if (record) {
+        dataPoints.push(emotionToScore(record.emotion));
+      } else {
+        dataPoints.push(null);
+      }
+    }
+
+    return { labels, dataPoints };
+  };
+
+  const weeklyData = getWeeklyData();
 
   const toggleExercise = (exercise) => {
     if (selectedExercises.includes(exercise)) {
@@ -115,22 +163,49 @@ function CalendarPage() {
   const handleEmotionSave = async (emotionData) => {
     if (selectedDay) {
       try {
-        // 감정 라벨을 백엔드 value로 변환
-        const emotionObj = emotions.find(e => e.label === emotionData.selectedEmoji);
-        const emotionValue = emotionObj ? emotionObj.value : "neutral";
+        // emotionData.selectedEmoji는 이미 id(영어)로 전달됨
+        const emotionValue = emotionData.selectedEmoji; // 예: "happy", "tired" 등
+
+        // 이모지 심볼 찾기
+        const emotionObj = emotions.find(e => e.value === emotionValue);
+
+        const dateString = `${year}-${String(month).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
 
         const payload = {
-          date: `${year}-${String(month).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`,
+          date: dateString,
           emotion: emotionValue,
           memo: emotionData.memo || "",
         };
 
-        await saveEmotionRecord(payload);
+        const savedRecord = await saveEmotionRecord(payload);
 
         // 달력에 이모지 표시
         setCalendarRecords({
           ...calendarRecords,
           [selectedDay]: emotionObj ? emotionObj.symbol : "😐"
+        });
+
+        // allRecords 업데이트 (Weekly mood 차트 갱신을 위해)
+        const newRecord = {
+          date: dateString,
+          emotion: emotionValue,
+          emotion_emoji: emotionObj ? emotionObj.symbol : "😐",
+          memo: emotionData.memo || "",
+          ...savedRecord
+        };
+
+        // 기존 기록 업데이트 또는 새 기록 추가
+        setAllRecords(prevRecords => {
+          const existingIndex = prevRecords.findIndex(r => r.date === dateString);
+          if (existingIndex >= 0) {
+            // 기존 기록 업데이트
+            const updated = [...prevRecords];
+            updated[existingIndex] = newRecord;
+            return updated;
+          } else {
+            // 새 기록 추가
+            return [...prevRecords, newRecord];
+          }
         });
 
         setShowNewRecord(false);
@@ -145,7 +220,7 @@ function CalendarPage() {
 
   // 공통 모달
   const Modal = ({ children, onClose }) => (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <AnimatePresence>
         <motion.div
           key="modal"
@@ -153,11 +228,11 @@ function CalendarPage() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-2xl p-8 w-[600px] max-h-[80vh] overflow-y-auto relative shadow-2xl"
+          className="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-[600px] max-h-[80vh] overflow-y-auto relative shadow-2xl"
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-black"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-black text-lg sm:text-xl"
           >
             ✕
           </button>
@@ -168,22 +243,22 @@ function CalendarPage() {
   );
 
   return (
-    <div className="min-w-[1440px] min-h-screen bg-white font-sans">
+    <div className="w-full min-h-screen bg-white font-sans">
       {/* ✅ 공통 헤더 적용 */}
       <Header variant="default" />
 
       {/* 본문 */}
-      <main className="flex px-12 py-10 gap-12">
-        {/* 좌측 패널 */}
-        <section className="w-[320px] space-y-6">
+      <main className="flex flex-col lg:flex-row px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-10 gap-6 lg:gap-12">
+        {/* 좌측 패널 - 모바일에서는 숨김 또는 상단 배치 */}
+        <section className="hidden lg:block lg:w-[280px] xl:w-[320px] space-y-6">
           {/* Today overview */}
-          <div className="p-6 border rounded-2xl shadow-sm">
-            <p className="text-sm text-gray-500">✨ Today overview</p>
-            <div className="flex items-center mt-4 gap-3">
-              <img src={chartGradient} alt="Mood" className="w-10 h-10 rounded-full" />
+          <div className="p-4 sm:p-6 border rounded-2xl shadow-sm">
+            <p className="text-xs sm:text-sm text-gray-500">✨ Today overview</p>
+            <div className="flex items-center mt-3 sm:mt-4 gap-3">
+              <img src={chartGradient} alt="Mood" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full" />
               <div>
                 <p className="text-xs text-gray-500">Mood</p>
-                <p className="text-sm font-semibold">
+                <p className="text-xs sm:text-sm font-semibold">
                   차분 <span className="text-green-600">+12%</span>
                 </p>
               </div>
@@ -191,53 +266,28 @@ function CalendarPage() {
           </div>
 
           {/* Weekly mood */}
-          <div className="p-6 border rounded-2xl shadow-sm">
-            <p className="font-bold text-sm">Weekly mood</p>
-            <div className="mt-4">
-              <WeeklyMoodChart />
+          <div className="p-4 sm:p-6 border rounded-2xl shadow-sm">
+            <p className="font-bold text-xs sm:text-sm">Weekly mood</p>
+            <div className="mt-3 sm:mt-4">
+              <WeeklyMoodChart labels={weeklyData.labels} dataPoints={weeklyData.dataPoints} />
             </div>
           </div>
-
-          {/* Today's habits */}
-          {/* <div className="p-6 border rounded-2xl shadow-sm space-y-2">
-            <p className="font-bold text-sm">Today's habits</p>
-            <label className="flex gap-2 text-sm"><input type="checkbox" /> 물 6잔</label>
-            <label className="flex gap-2 text-sm"><input type="checkbox" /> 스트레칭 10분</label>
-            <label className="flex gap-2 text-sm"><input type="checkbox" /> 저녁 산책</label>
-          </div> */}
-
-          {/* Quick add */}
-          {/* <div className="p-6 border rounded-2xl shadow-sm">
-            <p className="text-sm text-gray-500">+ Quick add</p>
-            <div className="flex gap-2 mt-3">
-              <button className="px-3 py-1 border rounded-full text-xs">감정 기록</button>
-              <button className="px-3 py-1 border rounded-full text-xs">운동 추가</button>
-              <button className="px-3 py-1 border rounded-full text-xs">메모/태그</button>
-            </div>
-          </div> */}
-
-          {/* Reminders */}
-          {/* <div className="p-6 border rounded-2xl shadow-sm">
-            <p className="text-sm text-gray-500">🔔 Reminders</p>
-            <p className="text-xs mt-2">오전 8:30 감정 기록 알림</p>
-            <p className="text-xs">저녁 9:00 스트레칭 루틴</p>
-          </div> */}
         </section>
 
         {/* 달력 */}
-        <section className="flex-1">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">{year}년 {String(month).padStart(2, "0")}월</h1>
+        <section className="flex-1 max-w-full overflow-x-auto">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">{year}년 {String(month).padStart(2, "0")}월</h1>
             <div className="flex gap-2">
               <button
                 onClick={goToPreviousMonth}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base border rounded-lg hover:bg-gray-100"
               >
                 ◀
               </button>
               <button
                 onClick={goToNextMonth}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base border rounded-lg hover:bg-gray-100"
               >
                 ▶
               </button>
@@ -245,21 +295,21 @@ function CalendarPage() {
           </div>
 
           {/* 요일 헤더 */}
-          <div className="grid grid-cols-7 gap-3 mb-2">
-            <div className="text-center text-sm font-semibold text-gray-600">월</div>
-            <div className="text-center text-sm font-semibold text-gray-600">화</div>
-            <div className="text-center text-sm font-semibold text-gray-600">수</div>
-            <div className="text-center text-sm font-semibold text-gray-600">목</div>
-            <div className="text-center text-sm font-semibold text-gray-600">금</div>
-            <div className="text-center text-sm font-semibold text-blue-300">토</div>
-            <div className="text-center text-sm font-semibold text-red-300">일</div>
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 lg:gap-3 mb-2">
+            <div className="text-center text-xs sm:text-sm font-semibold text-gray-600">월</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-gray-600">화</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-gray-600">수</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-gray-600">목</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-gray-600">금</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-blue-300">토</div>
+            <div className="text-center text-xs sm:text-sm font-semibold text-red-300">일</div>
           </div>
 
           {/* 달력 */}
-          <div className="grid grid-cols-7 gap-3">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 lg:gap-3">
             {/* 빈 칸 채우기 */}
             {[...Array(startOffset)].map((_, i) => (
-              <div key={`empty-${i}`} className="h-20"></div>
+              <div key={`empty-${i}`} className="h-12 sm:h-16 lg:h-20"></div>
             ))}
 
             {/* 날짜 */}
@@ -267,14 +317,21 @@ function CalendarPage() {
               <button
                 key={i}
                 onClick={() => {
-                  setSelectedDay(i + 1);
+                  const clickedDay = i + 1;
+                  setSelectedDay(clickedDay);
+
+                  // 해당 날짜의 기존 기록 찾기
+                  const dateString = `${year}-${String(month).padStart(2, "0")}-${String(clickedDay).padStart(2, "0")}`;
+                  const record = allRecords.find(r => r.date === dateString);
+                  setExistingRecord(record || null);
+
                   setShowNewRecord(true);
                 }}
-                className="h-20 border rounded-xl flex flex-col items-start justify-start p-2 text-sm hover:bg-gradient-to-br hover:from-indigo-100 hover:to-purple-100 active:scale-95"
+                className="h-12 sm:h-16 lg:h-20 border rounded-lg sm:rounded-xl flex flex-col items-center justify-center p-1 sm:p-2 text-xs sm:text-sm hover:bg-gradient-to-br hover:from-indigo-100 hover:to-purple-100 active:scale-95 transition relative"
               >
-                <span className={getDayColor(i + 1)}>{i + 1}</span>
+                <span className={`absolute top-1 left-1 sm:top-2 sm:left-2 ${getDayColor(i + 1)}`}>{i + 1}</span>
                 {calendarRecords[i + 1] && (
-                  <span className="text-xl mt-1">{calendarRecords[i + 1]}</span>
+                  <span className="text-2xl sm:text-3xl lg:text-4xl">{calendarRecords[i + 1]}</span>
                 )}
               </button>
             ))}
@@ -296,6 +353,10 @@ function CalendarPage() {
             onSave={handleEmotionSave}
             onCancel={() => setShowNewRecord(false)}
             showDetails={false}
+            initialData={existingRecord ? {
+              selectedEmoji: existingRecord.emotion,
+              memo: existingRecord.memo || ""
+            } : {}}
           />
         </Modal>
       )}

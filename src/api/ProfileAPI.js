@@ -27,6 +27,8 @@ export const updateProfile = async (data) => {
   const token = getAccessToken();
   if (!token) throw new Error("로그인 토큰이 없습니다.");
 
+  console.log("📤 ProfileAPI - 전송 데이터:", data);
+
   try {
     const response = await axios.patch(`${PROFILE_BASE_URL}/me/`, data, {
       headers: {
@@ -34,6 +36,7 @@ export const updateProfile = async (data) => {
         "Content-Type": "application/json",
       },
     });
+    console.log("✅ ProfileAPI - 응답 데이터:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ 프로필 업데이트 실패:", error.response?.data || error.message);

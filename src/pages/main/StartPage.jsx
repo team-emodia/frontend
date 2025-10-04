@@ -130,18 +130,18 @@ const StartPage = () => {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full min-h-screen">
       {/* ====================== Start1 ====================== */}
       {page === 1 && (
-        <div className="h-screen w-full flex flex-col bg-gradient-to-br from-purple-100 to-blue-100">
+        <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-100 to-blue-100">
           <Header variant="default" /> {/* ✅ 공통 헤더 */}
           <main className="flex flex-1 flex-col items-center justify-center text-center px-4">
-            <h1 className="text-2xl md:text-3xl font-bold mb-8">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8">
               Ready to start with Emodia?
             </h1>
             <button
               onClick={() => setPage(2)}
-              className="px-8 py-3 rounded-md bg-purple-600 text-white font-semibold hover:bg-purple-700 transition"
+              className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-md bg-purple-600 text-white font-semibold hover:bg-purple-700 transition"
             >
               START
             </button>
@@ -153,7 +153,7 @@ const StartPage = () => {
       {page === 2 && (
         <div className="flex flex-col min-h-screen bg-gray-50">
           <Header variant="default" />
-          <main className="flex flex-1 flex-col items-center justify-center p-6">
+          <main className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
             <EmotionRecorder
               initialData={emotionData}
               onSave={handleEmotionSave}
@@ -168,18 +168,18 @@ const StartPage = () => {
       {page === 3 && (
         <div className="flex flex-col min-h-screen bg-gray-50">
           <Header variant="default" />
-          <main className="flex flex-1 flex-col items-center p-6">
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          <main className="flex flex-1 flex-col items-center p-4 sm:p-6 lg:p-8">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-center">
               {emotionData.selectedEmojiName} 하루였군요. 지금은 몸과 마음을 풀어볼 시간이에요
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 text-center">
               오늘의 감정과 최근 기록을 바탕으로 맞춤 스트레칭을 준비했어요
             </p>
 
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
               <button
                 onClick={() => setActiveTab("스트레칭")}
-                className={`px-6 py-2 rounded-full ${
+                className={`px-4 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base rounded-full ${
                   activeTab === "스트레칭"
                     ? "bg-indigo-500 text-white"
                     : "border text-gray-600"
@@ -189,7 +189,7 @@ const StartPage = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mb-8 w-full max-w-4xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 w-full max-w-4xl">
               <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-6 relative">
                 <p className="text-lg font-bold mb-2">목 왼쪽 풀기</p>
                 <div className="flex gap-2">
@@ -376,18 +376,18 @@ const StartPage = () => {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="px-8 py-3 text-white rounded-full mb-6"
-              style={{ backgroundImage: `url(${buttonGradient})` }}
+              className="px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full mb-6 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {loading ? "저장 중..." : "오늘의 감정 기록하기"}
+              <span>✍️</span>
+              {loading ? "저장 중..." : "사용자 리뷰 작성하기"}
             </button>
 
             <div className="flex gap-4 mb-6">
               <button
-                onClick={() => navigate("/calendar")}
+                onClick={() => setPage(3)}
                 className="px-6 py-3 border rounded-lg"
               >
-                캘린더로 이동
+                이전
               </button>
               <button
                 onClick={() => navigate("/")}
@@ -396,15 +396,15 @@ const StartPage = () => {
                 홈으로 이동
               </button>
               <button
-                onClick={() => setPage(3)}
+                onClick={() => navigate("/calendar")}
                 className="px-6 py-3 border rounded-lg"
               >
-                이전
+                캘린더로 이동
               </button>
             </div>
 
             <p className="text-sm text-gray-500">
-              Tip: 기록을 남기면 내일 더 정확한 추천을 받아요
+              Tip: 리뷰를 남기면 Emodia에 도움이 돼요!
             </p>
           </main>
         </div>

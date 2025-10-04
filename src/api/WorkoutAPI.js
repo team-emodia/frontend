@@ -1,7 +1,7 @@
 // src/api/WorkoutAPI.js
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/emodia";
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 /**
  * ✅ 운동 기록 저장
@@ -139,6 +139,54 @@ export const fetchWorkoutVideos = async () => {
   }
 };
 
+/**
+ * 영상 목록 조회 (필터링 가능)
+ * @param {Object} filters - { difficulty, body_part, exercise_type, duration_min, duration_max }
+ */
+export const fetchVideos = async (filters = {}) => {
+  try {
+    const token = localStorage.getItem("access");
+    const params = new URLSearchParams();
+
+    if (filters.difficulty) params.append('difficulty', filters.difficulty);
+    if (filters.body_part) params.append('body_part', filters.body_part);
+    if (filters.exercise_type) params.append('exercise_type', filters.exercise_type);
+    if (filters.duration_min) params.append('duration_min', filters.duration_min);
+    if (filters.duration_max) params.append('duration_max', filters.duration_max);
+    if (filters.ordering) params.append('ordering', filters.ordering);
+
+    const url = `${API_BASE_URL}/videos/${params.toString() ? '?' + params.toString() : ''}`;
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ 영상 목록 조회 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 영상 상세 조회
+ * @param {number} videoId - 영상 ID
+ */
+export const fetchVideoDetail = async (videoId) => {
+  try {
+    const token = localStorage.getItem("access");
+    const response = await axios.get(`${API_BASE_URL}/videos/${videoId}/`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ 영상 상세 조회 실패:", error);
+    throw error;
+  }
+};
+
 // ✅ eslint 경고 방지: default export는 변수에 담아 내보내기
 const WorkoutAPI = {
   saveWorkoutRecord,
@@ -147,6 +195,8 @@ const WorkoutAPI = {
   submitPoseFrame,
   getWorkoutSessions,
   fetchWorkoutVideos,
+  fetchVideos,
+  fetchVideoDetail,
 };
 
 export default WorkoutAPI;

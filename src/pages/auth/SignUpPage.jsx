@@ -74,34 +74,34 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col bg-white">
+    <div className="w-full min-h-screen flex flex-col bg-white">
       {/* 상단바 (signup 모드) */}
       <Header variant="signup" />
 
       {/* 메인 */}
-      <main className="flex flex-1 items-center justify-center px-8">
+      <main className="flex flex-1 flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-8 py-8 lg:py-0 gap-8 lg:gap-0">
         {/* 왼쪽 이미지 */}
-        <div className="flex-1 flex justify-center items-center">
+        <div className="flex-1 flex justify-center items-center w-full lg:w-auto">
           <img
             src={signupBg}
             alt="Signup Illustration"
-            className="rounded-2xl shadow-lg max-w-md"
+            className="rounded-2xl shadow-lg w-full max-w-sm sm:max-w-md"
           />
         </div>
 
         {/* 오른쪽 회원가입 폼 */}
-        <div className="flex-1 max-w-md">
-          <h2 className="text-2xl font-semibold mb-8 text-gray-900 italic">
+        <div className="flex-1 w-full max-w-md px-4 sm:px-0">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-6 sm:mb-8 text-gray-900 italic">
             Create Account
           </h2>
 
-          <form onSubmit={handleSignUp} className="space-y-5">
+          <form onSubmit={handleSignUp} className="space-y-4 sm:space-y-5">
             <input
               type="text"
               placeholder="User Name"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
               required
             />
 
@@ -110,7 +110,7 @@ const SignUpPage = () => {
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
               required
             />
 
@@ -119,7 +119,7 @@ const SignUpPage = () => {
               placeholder="Password (최소 8자리, 영문+숫자 포함)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
               required
             />
 
@@ -128,13 +128,13 @@ const SignUpPage = () => {
               placeholder="Check the password"
               value={passwordCheck}
               onChange={(e) => setPasswordCheck(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
               required
             />
 
             {passwordMessage && (
               <p
-                className={`text-sm ${
+                className={`text-xs sm:text-sm ${
                   isPasswordValid ? "text-green-600" : "text-red-500"
                 }`}
               >
@@ -145,7 +145,7 @@ const SignUpPage = () => {
             <button
               type="submit"
               disabled={!isPasswordValid}
-              className={`w-full py-3 rounded-xl text-white font-semibold transition ${
+              className={`w-full py-3 rounded-xl text-white font-semibold transition text-sm sm:text-base ${
                 isPasswordValid
                   ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90"
                   : "bg-gray-300 cursor-not-allowed"
@@ -156,23 +156,23 @@ const SignUpPage = () => {
           </form>
 
           {/* 소셜 로그인 */}
-          <div className="mt-6 space-y-3">
-            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
-              <img src={logoKakao} alt="Kakao" className="w-5 h-5 mr-2" />
+          <div className="mt-5 sm:mt-6 space-y-2 sm:space-y-3">
+            <button className="w-full flex items-center justify-center py-2.5 sm:py-3 rounded-xl border border-gray-300 hover:bg-gray-50 text-sm sm:text-base">
+              <img src={logoKakao} alt="Kakao" className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Login with Kakao
             </button>
-            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
-              <img src={logoApple} alt="Apple" className="w-5 h-5 mr-2" />
+            <button className="w-full flex items-center justify-center py-2.5 sm:py-3 rounded-xl border border-gray-300 hover:bg-gray-50 text-sm sm:text-base">
+              <img src={logoApple} alt="Apple" className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Login with Apple
             </button>
-            <button className="w-full flex items-center justify-center py-3 rounded-xl border border-gray-300 hover:bg-gray-50">
-              <img src={logoGoogle} alt="Google" className="w-5 h-5 mr-2" />
+            <button className="w-full flex items-center justify-center py-2.5 sm:py-3 rounded-xl border border-gray-300 hover:bg-gray-50 text-sm sm:text-base">
+              <img src={logoGoogle} alt="Google" className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Login with Google
             </button>
           </div>
 
           {/* 로그인 페이지 이동 */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-gray-600">
             Already have an account?{" "}
             <button
               onClick={() => navigate("/login")}

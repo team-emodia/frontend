@@ -59,8 +59,8 @@ const StatsPage = () => {
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center">
       <Header variant="default" />
-      <main className="w-full max-w-5xl mx-auto px-8 py-12">
-        <h1 className="text-4xl font-bold italic mb-4">Stats</h1>
+      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold italic mb-4 sm:mb-6">Stats</h1>
         <WeeklyMoodChart labels={labels} dataPoints={dataPoints} />
       </main>
     </div>

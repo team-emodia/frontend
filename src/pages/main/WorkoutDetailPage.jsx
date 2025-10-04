@@ -2,6 +2,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../common/Header";
+import ExerciseVideo from "../../components/ExerciseVideo";
 
 const WorkoutDetailPage = () => {
   const location = useLocation();
@@ -28,42 +29,40 @@ const WorkoutDetailPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header variant="default" />
 
-      <main className="flex-1 flex flex-col items-center p-8">
-        <div className="w-full max-w-4xl">
+      <main className="flex flex-1 p-6 flex-col items-center">
+        {/* 제목 및 설명 */}
+        <h1 className="text-2xl font-bold mb-2">{workout.title}</h1>
+        <p className="text-gray-600 mb-6">
+          {workout.level} · {workout.body_part} · {workout.exercise_type} · {workout.duration_minutes}분
+        </p>
+
+        {/* 비디오 영역 */}
+        <div className="w-full max-w-6xl grid grid-cols-1 justify-items-center gap-6">
+          <div className="w-1/2">
+            <ExerciseVideo
+              videoUrl={workout.videoUrl}
+              title={workout.title}
+            />
+          </div>
+        </div>
+
+        {/* 버튼 영역 */}
+        <div className="flex gap-4 mt-8">
           <button
             onClick={() => navigate("/workout")}
-            className="mb-4 px-4 py-2 border rounded-lg hover:bg-gray-100"
+            className="px-6 py-3 border rounded-lg hover:bg-gray-100"
           >
-            ← 목록으로
+            목록으로 돌아가기
           </button>
-
-          <h1 className="text-3xl font-bold mb-4">{workout.title}</h1>
-          <p className="text-gray-600 mb-6">{workout.desc}</p>
-
-          {/* 비디오 재생 */}
-          <div className="bg-black rounded-xl overflow-hidden mb-6">
-            <video
-              controls
-              className="w-full"
-              src={workout.videoUrl}
-            >
-              브라우저가 비디오 재생을 지원하지 않습니다.
-            </video>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-semibold mb-2">난이도</h3>
-              <p className="text-gray-600">{workout.level}</p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h3 className="font-semibold mb-2">운동 종류</h3>
-              <p className="text-gray-600">{workout.desc}</p>
-            </div>
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+          >
+            홈으로 이동
+          </button>
         </div>
       </main>
     </div>

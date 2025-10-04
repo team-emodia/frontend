@@ -48,36 +48,36 @@ const AboutPage = () => {
       <Header />
 
       {/* ================= 메인 콘텐츠 ================= */}
-      <main className="flex-1 flex flex-col items-center text-center px-6 py-16">
-        <h2 className="text-4xl font-medium text-gray-800 leading-snug">
+      <main className="flex-1 flex flex-col items-center text-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-800 leading-snug">
           감정 기반 헬스케어, <span className="italic font-bold">Emodia</span>
           <br />
           하루 <span className="font-bold">1분</span>, 나의 패턴을 이해해요
         </h2>
-        <p className="text-lg text-gray-500 mt-4">
+        <p className="text-base sm:text-lg text-gray-500 mt-3 sm:mt-4">
           이모지로 감정을 남기고, 루틴을 체크하면 주간 인사이트로 연결됩니다.
-          <br />
-          작은 기록이 쌓여 더 나은 컨디션으로 안내해요.
+          <br className="hidden sm:block" />
+          <span className="block sm:inline">작은 기록이 쌓여 더 나은 컨디션으로 안내해요.</span>
         </p>
 
         {/* 카드 섹션 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 w-full max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-8 sm:mt-12 lg:mt-16 w-full max-w-6xl">
           {cards.map((card) => (
             <div
               key={card.id}
-              className="bg-white rounded-2xl shadow p-8 min-h-[300px] flex flex-col justify-between items-center cursor-pointer hover:shadow-lg transition"
+              className="bg-white rounded-2xl shadow p-6 sm:p-8 min-h-[280px] sm:min-h-[300px] flex flex-col justify-between items-center cursor-pointer hover:shadow-lg transition"
               onClick={() => setOpenModal(card)}
             >
               <img
                 src={card.image}
                 alt={card.title}
-                className="w-24 h-24 object-contain mb-4"
+                className="w-20 h-20 sm:w-24 sm:h-24 object-contain mb-4"
               />
-              <h3 className="text-lg font-semibold">{card.title}</h3>
-              <p className="text-sm text-gray-500 mt-2 text-center">
+              <h3 className="text-base sm:text-lg font-semibold">{card.title}</h3>
+              <p className="text-xs sm:text-sm text-gray-500 mt-2 text-center">
                 {card.desc}
               </p>
-              <button className="mt-6 px-4 py-2 text-sm bg-gray-100 rounded-full text-purple-600 font-medium hover:bg-gray-200">
+              <button className="mt-4 sm:mt-6 px-4 py-2 text-xs sm:text-sm bg-gray-100 rounded-full text-purple-600 font-medium hover:bg-gray-200">
                 자세히 보기
               </button>
             </div>
@@ -89,11 +89,11 @@ const AboutPage = () => {
 
       {/* ================= 모달 ================= */}
       {openModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-12 w-[480px] relative shadow-lg">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 sm:p-12 w-full max-w-[480px] relative shadow-lg">
             {/* 닫기 버튼 */}
             <button
-              className="absolute top-4 right-4 text-lg font-bold text-gray-600 hover:text-gray-800"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-lg sm:text-xl font-bold text-gray-600 hover:text-gray-800"
               onClick={() => setOpenModal(null)}
             >
               ✕
@@ -104,10 +104,10 @@ const AboutPage = () => {
               <img
                 src={openModal.image}
                 alt={openModal.title}
-                className="w-32 h-32 mb-6 object-contain"
+                className="w-24 h-24 sm:w-32 sm:h-32 mb-4 sm:mb-6 object-contain"
               />
-              <h3 className="text-2xl font-bold mb-4">{openModal.title}</h3>
-              <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line max-h-[320px] overflow-y-auto">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{openModal.title}</h3>
+              <p className="text-sm sm:text-lg text-gray-700 leading-relaxed whitespace-pre-line max-h-[280px] sm:max-h-[320px] overflow-y-auto">
                 {openModal.modalDesc}
               </p>
             </div>

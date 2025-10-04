@@ -13,7 +13,7 @@ const EmotionRecorder = ({ onSave, onCancel, initialData = {}, showDetails = tru
     { id: "sad", name: "우울", icon: "😔" },
   ];
 
-  const [selectedEmoji, setSelectedEmoji] = useState(initialData.selectedEmoji || "tired");
+  const [selectedEmoji, setSelectedEmoji] = useState(initialData.selectedEmoji || null);
   const [intensity, setIntensity] = useState(initialData.intensity || 50);
   const [memo, setMemo] = useState(initialData.memo || "");
   const [selectedMemos, setSelectedMemos] = useState(initialData.selectedMemos || []);
@@ -27,6 +27,10 @@ const EmotionRecorder = ({ onSave, onCancel, initialData = {}, showDetails = tru
   };
 
   const handleSave = () => {
+    if (!selectedEmoji) {
+      alert("감정을 선택해주세요.");
+      return;
+    }
     const selectedEmojiName = emojis.find(e => e.id === selectedEmoji)?.name || "";
     onSave({
       selectedEmoji: selectedEmoji, // 이제 id (영어)

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { updateProfile } from "../../api/ProfileAPI";
 
 // 배경 & 그래픽
 import bgHero from "../../assets/bg/intro-hero.png";
@@ -21,24 +22,167 @@ import optionStress from "../../assets/illustrations/option-stress.svg";
 import optionHabit from "../../assets/illustrations/option-habit.svg";
 import optionEnergy from "../../assets/illustrations/option-energy.svg";
 
+// 타임 피커 휠 컴포넌트
+const TimeWheel = ({ list, selected, setSelected }) => {
+  const containerRef = React.useRef(null);
+  const ITEM_HEIGHT = 50;
+  const selectedIndex = list.indexOf(selected);
+
+  // 무한 스크롤을 위해 리스트를 3번 복제
+  const infiniteList = [...list, ...list, ...list];
+
+  // 선택값 변경 시 스크롤 위치 업데이트
+  React.useEffect(() => {
+    if (containerRef.current) {
+      const targetScroll = (list.length + selectedIndex) * ITEM_HEIGHT;
+      containerRef.current.scrollTo({
+        top: targetScroll,
+        behavior: 'auto'
+      });
+    }
+  }, [selected, list.length, selectedIndex, ITEM_HEIGHT]);
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 1 : -1;
+    const newIndex = (selectedIndex + delta + list.length) % list.length;
+    setSelected(list[newIndex]);
+  };
+
+  return (
+    <div className="relative w-24">
+      {/* 선택 영역 하이라이트 */}
+      <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 h-12 bg-purple-50/30 border-y-2 border-purple-300 pointer-events-none z-0"></div>
+
+      {/* 위쪽 그라디언트 */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white to-transparent pointer-events-none z-10"></div>
+
+      {/* 아래쪽 그라디언트 */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
+
+      <div
+        ref={containerRef}
+        className="h-60 overflow-y-scroll relative z-20"
+        onWheel={handleWheel}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        <style>{`
+          .overflow-y-scroll::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        {/* 상단 패딩 */}
+        <div style={{ height: `${ITEM_HEIGHT * 2}px` }}></div>
+
+        {infiniteList.map((item, idx) => {
+          // 중간 섹션(두 번째 복제본) 기준으로 계산
+          const centerIndex = list.length + selectedIndex;
+          const distance = Math.abs(idx - centerIndex);
+          const isSelected = idx === centerIndex;
+
+          return (
+            <div
+              key={`${item}-${idx}`}
+              className={`flex items-center justify-center select-none transition-all duration-200 cursor-pointer ${
+                isSelected
+                  ? "text-4xl font-black text-purple-600"
+                  : distance === 1
+                  ? "text-2xl font-bold text-gray-600"
+                  : distance === 2
+                  ? "text-xl font-semibold text-gray-400"
+                  : "text-lg text-gray-300"
+              }`}
+              style={{
+                height: `${ITEM_HEIGHT}px`,
+                opacity: distance > 2 ? 0.3 : 1
+              }}
+              onClick={() => {
+                const actualIndex = idx % list.length;
+                setSelected(list[actualIndex]);
+              }}
+            >
+              {item.toString().padStart(2, "0")}
+            </div>
+          );
+        })}
+
+        {/* 하단 패딩 */}
+        <div style={{ height: `${ITEM_HEIGHT * 2}px` }}></div>
+      </div>
+    </div>
+  );
+};
+
 const IntroPage = () => {
   const [step, setStep] = useState(1);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [selectedHour, setSelectedHour] = useState(8);
-  const [selectedMinute, setSelectedMinute] = useState(30);
-  const [ampm, setAmpm] = useState("AM");
-  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedHour, setSelectedHour] = useState(9);
+  const [selectedMinute, setSelectedMinute] = useState(0);
+  const [selectedDays, setSelectedDays] = useState(["월", "화", "수", "목", "금", "토", "일"]);
   const [weeklyAlarm, setWeeklyAlarm] = useState(false);
 
   const navigate = useNavigate();
 
-  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+  const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
-  const handleNext = () => {
-    if (step < 5) setStep(step + 1);
-    else navigate("/main");
+  // 목표 옵션 매핑
+  const goalOptions = [
+    { title: "목·어깨 뭉침 완화", value: "relax" },
+    { title: "수면의 질 개선", value: "sleep" },
+    { title: "스트레스 관리", value: "stress" },
+    { title: "꾸준한 기록 습관 만들기", value: "habit" },
+    { title: "에너지 회복", value: "energy" },
+  ];
+
+  const handleNext = async () => {
+    if (step === 5) {
+      // 마지막 단계에서 프로필 저장
+      try {
+        const timeString = `${String(selectedHour).padStart(2, "0")}:${String(selectedMinute).padStart(2, "0")}:00`;
+
+        // 토큰 확인
+        const token = localStorage.getItem("access");
+        if (!token) {
+          alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
+          navigate("/login");
+          return;
+        }
+
+        const profileData = {
+          main_goal: selectedOption !== null ? goalOptions[selectedOption].value : null,
+          routine_time: timeString,
+          routine_days: selectedDays,
+        };
+
+        console.log("저장할 프로필 데이터:", profileData);
+        const result = await updateProfile(profileData);
+        console.log("저장 결과:", result);
+
+        alert("설정이 저장되었습니다!");
+        navigate("/main");
+      } catch (error) {
+        console.error("프로필 저장 실패:", error);
+
+        // 401 에러인 경우 로그인 페이지로 이동
+        if (error.response?.status === 401) {
+          alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+          localStorage.removeItem("access");
+          localStorage.removeItem("refresh");
+          navigate("/login");
+        } else {
+          alert("설정 저장에 실패했습니다. 다시 시도해주세요.");
+        }
+      }
+    } else if (step < 5) {
+      setStep(step + 1);
+    }
   };
+
   const handlePrev = () => {
     if (step > 1) setStep(step - 1);
   };
@@ -68,40 +212,6 @@ const IntroPage = () => {
     animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
     exit: { opacity: 0, y: -40, transition: { duration: 0.4 } },
   };
-
-  // 타임 피커 (스크롤형)
-  const renderWheel = (list, selected, setSelected) => (
-    <div className="h-40 overflow-hidden relative w-16">
-      <div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        style={{ height: "200%", overflow: "hidden" }}
-        onWheel={(e) => {
-          e.preventDefault();
-          if (e.deltaY > 0) {
-            const idx = list.indexOf(selected);
-            setSelected(list[(idx + 1) % list.length]);
-          } else {
-            const idx = list.indexOf(selected);
-            setSelected(list[(idx - 1 + list.length) % list.length]);
-          }
-        }}
-      >
-        {list.map((item) => (
-          <div
-            key={item}
-            onClick={() => setSelected(item)}
-            className={`text-center py-1 cursor-pointer ${
-              item === selected
-                ? "text-4xl font-bold text-black"
-                : "text-lg text-gray-400"
-            }`}
-          >
-            {item.toString().padStart(2, "0")}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -271,11 +381,11 @@ const IntroPage = () => {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl w-full mb-8">
                 {[
-                  { title: "목·어깨 뭉침 완화", img: optionNeck },
-                  { title: "수면의 질 개선", img: optionSleep },
-                  { title: "스트레스 관리", img: optionStress },
-                  { title: "꾸준한 기록 습관 만들기", img: optionHabit },
-                  { title: "에너지 회복", img: optionEnergy },
+                  { title: "목·어깨 뭉침 완화", img: optionNeck, value: "relax" },
+                  { title: "수면의 질 개선", img: optionSleep, value: "sleep" },
+                  { title: "스트레스 관리", img: optionStress, value: "stress" },
+                  { title: "꾸준한 기록 습관 만들기", img: optionHabit, value: "habit" },
+                  { title: "에너지 회복", img: optionEnergy, value: "energy" },
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
@@ -329,55 +439,44 @@ const IntroPage = () => {
 
               {/* 추천 시간 */}
               <div className="flex gap-3 mb-6">
-                {["06:30", "07:00", "08:30", "09:00"].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setSelectedHour(parseInt(t.split(":")[0]))}
-                    className={`px-4 py-1 rounded-full text-sm font-medium relative ${
-                      `${selectedHour}:${selectedMinute}`.startsWith(t)
-                        ? "text-white"
-                        : "text-gray-700"
-                    }`}
-                    style={{
-                      backgroundImage:
-                        `${selectedHour}:${selectedMinute}`.startsWith(t)
-                          ? `url(${recommendTimeGradient})`
-                          : "none",
-                      backgroundColor: `${selectedHour}:${selectedMinute}`.startsWith(
-                        t
-                      )
-                        ? "transparent"
-                        : "#f3f4f6",
-                      backgroundSize: "cover",
-                    }}
-                  >
-                    {t}
-                  </button>
-                ))}
+                {["07:00", "12:30", "19:30", "22:00"].map((t) => {
+                  const [h, m] = t.split(":").map(Number);
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => {
+                        setSelectedHour(h);
+                        setSelectedMinute(m);
+                      }}
+                      className={`px-4 py-1 rounded-full text-sm font-medium relative ${
+                        selectedHour === h && selectedMinute === m
+                          ? "text-white"
+                          : "text-gray-700"
+                      }`}
+                      style={{
+                        backgroundImage:
+                          selectedHour === h && selectedMinute === m
+                            ? `url(${recommendTimeGradient})`
+                            : "none",
+                        backgroundColor:
+                          selectedHour === h && selectedMinute === m
+                            ? "transparent"
+                            : "#f3f4f6",
+                        backgroundSize: "cover",
+                      }}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* 커스텀 타임 피커 */}
               <div className="bg-white rounded-2xl p-8 max-w-lg w-full mb-12 shadow flex flex-col items-center">
                 <div className="flex justify-center gap-6 items-center mb-6">
-                  {renderWheel(hours, selectedHour, setSelectedHour)}
+                  <TimeWheel key={`hour-${selectedHour}`} list={hours} selected={selectedHour} setSelected={setSelectedHour} />
                   <span className="text-4xl font-bold text-gray-800">:</span>
-                  {renderWheel(minutes, selectedMinute, setSelectedMinute)}
-
-                  <div className="flex flex-col space-y-2 ml-4">
-                    {["AM", "PM"].map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setAmpm(m)}
-                        className={`px-4 py-1 rounded-full text-sm font-bold ${
-                          ampm === m
-                            ? "bg-purple-500 text-white"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
+                  <TimeWheel key={`minute-${selectedMinute}`} list={minutes} selected={selectedMinute} setSelected={setSelectedMinute} />
                 </div>
 
                 {/* 요일 선택 */}
@@ -412,7 +511,23 @@ const IntroPage = () => {
                     <input
                       type="checkbox"
                       checked={weeklyAlarm}
-                      onChange={() => setWeeklyAlarm(!weeklyAlarm)}
+                      onChange={() => {
+                        const newWeeklyAlarm = !weeklyAlarm;
+                        setWeeklyAlarm(newWeeklyAlarm);
+
+                        if (newWeeklyAlarm) {
+                          // 주말 쉬기 활성화: 토, 일 제거
+                          setSelectedDays(prev => prev.filter(day => day !== "토" && day !== "일"));
+                        } else {
+                          // 주말 쉬기 비활성화: 토, 일 추가
+                          setSelectedDays(prev => {
+                            const newDays = [...prev];
+                            if (!newDays.includes("토")) newDays.push("토");
+                            if (!newDays.includes("일")) newDays.push("일");
+                            return newDays;
+                          });
+                        }
+                      }}
                       className="sr-only"
                     />
                     <div
@@ -437,17 +552,7 @@ const IntroPage = () => {
                 >
                   이전
                 </button>
-                  <button
-                      onClick={() => navigate("/"
-                      )}
-                      className="px-6 py-3
-                      rounded-full bg-red-500 text-white
-                       font-semibold hover:bg-red-600
-                       transition"
-                      >
-                      나중에 설정
-                  </button>
-                          <GradientButton text="다음" onClick={handleNext} />
+                <GradientButton text="완료" onClick={handleNext} />
               </div>
             </>
           )}

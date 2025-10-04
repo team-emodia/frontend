@@ -35,14 +35,14 @@ const MainPage = () => {
       <Header />
 
       {/* ================= 중앙 콘텐츠 ================= */}
-      <main className="flex flex-col items-center justify-center flex-grow text-center">
+      <main className="flex flex-col items-center justify-center flex-grow text-center px-4">
         {/* 중앙 로고 텍스트 */}
-        <h1 className="text-6xl italic font-bold text-white mb-16 drop-shadow-lg">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl italic font-bold text-white mb-8 sm:mb-12 md:mb-16 drop-shadow-lg">
           Emodia
         </h1>
 
         {/* 하단 네비 메뉴 */}
-        <div className="flex space-x-12 text-white font-medium text-lg">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 text-white font-medium text-sm sm:text-base md:text-lg">
           {/* About */}
           <button
             onClick={() => navigate("/about")}
@@ -61,7 +61,7 @@ const MainPage = () => {
 
           {/* Home */}
           <button onClick={() => navigate("/")}>
-            <img src={homeIcon} alt="Home" className="w-6 h-6 mx-2" />
+            <img src={homeIcon} alt="Home" className="w-5 h-5 sm:w-6 sm:h-6 mx-2" />
           </button>
 
           {/* Workout */}
